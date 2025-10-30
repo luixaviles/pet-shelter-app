@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Observable, switchMap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
+import { TranslatorService } from '../../services/translator.service';
 
 @Component({
   selector: 'app-pet-detail',
@@ -16,10 +17,17 @@ import { Pet } from '../../models/pet.model';
 export class PetDetailComponent implements OnInit {
   pet$!: Observable<Pet | undefined>;
   selectedLanguage: 'en' | 'es' | 'fr' = 'en';
+  translatedDescription: string | null = null;
+  isTranslating: boolean = false;
+  translationProgress: number = 0;
+  translationError: string | null = null;
+  originalDescription: string = '';
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private petService = inject(PetService);
+  private translatorService = inject(TranslatorService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.pet$ = this.route.paramMap.pipe(
@@ -30,8 +38,72 @@ export class PetDetailComponent implements OnInit {
           return [];
         }
         return this.petService.getPetById(id);
+      }),
+      tap(pet => {
+        if (pet?.description) {
+          this.originalDescription = pet.description;
+          this.cdr.markForCheck();
+        }
       })
     );
+  }
+
+  onLanguageChange(newLanguage: 'en' | 'es' | 'fr', pet: Pet): void {
+    this.selectedLanguage = newLanguage;
+    this.translationError = null;
+    
+    if (newLanguage === 'en') {
+      // Show original description for English
+      this.translatedDescription = null;
+      this.cdr.markForCheck();
+    } else {
+      // Translate to the selected language
+      this.translateDescription(pet, newLanguage);
+    }
+  }
+
+  async translateDescription(pet: Pet, targetLanguage: string): Promise<void> {
+    if (!pet.description || this.isTranslating) {
+      return;
+    }
+
+    this.isTranslating = true;
+    this.translationProgress = 0;
+    this.translationError = null;
+    this.cdr.markForCheck();
+
+    try {
+      // Check if Translator API is available
+      if (!this.translatorService.isTranslatorAvailable()) {
+        throw new Error('Translator API is not available in this browser.');
+      }
+
+      const sourceLanguage = 'en'; // Pet descriptions are always in English initially
+
+      // Translate with progress monitoring
+      const translated = await this.translatorService.translateText(
+        this.originalDescription || pet.description,
+        sourceLanguage,
+        targetLanguage,
+        (progress) => {
+          this.translationProgress = progress;
+          this.cdr.markForCheck();
+        }
+      );
+
+      this.translatedDescription = translated;
+      console.log('[Translation]', { sourceLanguage, targetLanguage, translated });
+    } catch (err: any) {
+      const message = err?.message || 'Failed to translate description. Please try again.';
+      this.translationError = message;
+      console.error('[Translation][error]', err);
+      // Keep original description visible on error
+      this.translatedDescription = null;
+    } finally {
+      this.isTranslating = false;
+      this.translationProgress = 0;
+      this.cdr.markForCheck();
+    }
   }
 
   onAdopt(pet: Pet): void {
