@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Observable, switchMap } from 'rxjs';
 import { PetService } from '../../services/pet.service';
@@ -7,8 +7,7 @@ import { Pet } from '../../models/pet.model';
 
 @Component({
   selector: 'app-pet-detail',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, NgOptimizedImage],
   template: `
     <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-5xl mx-auto">
@@ -22,104 +21,107 @@ import { Pet } from '../../models/pet.model';
           Back to All Pets
         </button>
 
-        <div *ngIf="pet$ | async as pet; else loading" class="animate-fade-in">
-          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="md:flex">
-              <div class="md:w-1/2">
-                <img
-                  [src]="pet.imageUrl"
-                  [alt]="pet.name"
-                  class="w-full h-full object-cover"
-                />
-              </div>
-
-              <div class="md:w-1/2 p-8">
-                <div class="flex items-center justify-between mb-4">
-                  <h1 class="text-4xl font-bold text-gray-800">{{ pet.name }}</h1>
-                  <span class="text-4xl">
-                    {{ pet.animalType === 'cat' ? '🐱' : '🐕' }}
-                  </span>
+        @if (pet$ | async; as pet) {
+          <div class="animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div class="md:flex">
+                <div class="md:w-1/2">
+                  <img
+                    ngSrc="{{ pet.imageUrl }}"
+                    [alt]="pet.name"
+                    width="900"
+                    height="700"
+                    class="w-full h-full object-cover"
+                  />
                 </div>
 
-                <div class="space-y-4 mb-6">
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Animal Type:</span>
-                    <span class="text-gray-600 capitalize">{{ pet.animalType }}</span>
+                <div class="md:w-1/2 p-8">
+                  <div class="flex items-center justify-between mb-4">
+                    <h1 class="text-4xl font-bold text-gray-800">{{ pet.name }}</h1>
+                    <span class="text-4xl">
+                      {{ pet.animalType === 'cat' ? '🐱' : '🐕' }}
+                    </span>
                   </div>
 
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Breed:</span>
-                    <span class="text-gray-600">{{ pet.breed }}</span>
+                  <div class="space-y-4 mb-6">
+                    <div class="flex items-center border-b border-gray-200 pb-3">
+                      <span class="font-semibold text-gray-700 w-32">Animal Type:</span>
+                      <span class="text-gray-600 capitalize">{{ pet.animalType }}</span>
+                    </div>
+
+                    <div class="flex items-center border-b border-gray-200 pb-3">
+                      <span class="font-semibold text-gray-700 w-32">Breed:</span>
+                      <span class="text-gray-600">{{ pet.breed }}</span>
+                    </div>
+
+                    <div class="flex items-center border-b border-gray-200 pb-3">
+                      <span class="font-semibold text-gray-700 w-32">Gender:</span>
+                      <span class="text-gray-600 capitalize">{{ pet.gender }}</span>
+                    </div>
+
+                    <div class="flex items-center border-b border-gray-200 pb-3">
+                      <span class="font-semibold text-gray-700 w-32">Age:</span>
+                      <span class="text-gray-600">{{ pet.age }} {{ pet.age === 1 ? 'year' : 'years' }} old</span>
+                    </div>
+
+                    <div class="flex items-center border-b border-gray-200 pb-3">
+                      <span class="font-semibold text-gray-700 w-32">Location:</span>
+                      <span class="text-gray-600">{{ pet.location }}</span>
+                    </div>
+
+                    <div class="flex items-center border-b border-gray-200 pb-3">
+                      <span class="font-semibold text-gray-700 w-32">Available From:</span>
+                      <span class="text-gray-600">{{ pet.adoptionDate }}</span>
+                    </div>
                   </div>
 
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Gender:</span>
-                    <span class="text-gray-600 capitalize">{{ pet.gender }}</span>
+                  <div class="bg-gray-50 rounded-lg p-5 mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-3">About {{ pet.name }}</h2>
+                    <p class="text-gray-600 leading-relaxed">{{ pet.description }}</p>
                   </div>
 
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Age:</span>
-                    <span class="text-gray-600">{{ pet.age }} {{ pet.age === 1 ? 'year' : 'years' }} old</span>
-                  </div>
-
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Location:</span>
-                    <span class="text-gray-600">{{ pet.location }}</span>
-                  </div>
-
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Available From:</span>
-                    <span class="text-gray-600">{{ pet.adoptionDate }}</span>
-                  </div>
+                  <button
+                    (click)="onAdopt(pet)"
+                    class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+                  >
+                    Adopt {{ pet.name }} Today!
+                  </button>
                 </div>
-
-                <div class="bg-gray-50 rounded-lg p-5 mb-6">
-                  <h2 class="text-xl font-semibold text-gray-800 mb-3">About {{ pet.name }}</h2>
-                  <p class="text-gray-600 leading-relaxed">{{ pet.description }}</p>
-                </div>
-
-                <button
-                  (click)="onAdopt(pet)"
-                  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
-                >
-                  Adopt {{ pet.name }} Today!
-                </button>
               </div>
             </div>
           </div>
-        </div>
-
-        <ng-template #loading>
+        } @else {
           <div class="flex items-center justify-center py-20 animate-fade-in">
             <div class="text-center">
               <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary-500 mb-4"></div>
               <p class="text-xl text-gray-600">Loading pet details...</p>
             </div>
           </div>
-        </ng-template>
+        }
 
-        <div *ngIf="!(pet$ | async)" class="text-center py-20 animate-fade-in">
-          <p class="text-2xl text-gray-500 mb-6">Pet not found</p>
-          <button
-            routerLink="/"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-          >
-            Return to Pet List
-          </button>
-        </div>
+        @if (!(pet$ | async)) {
+          <div class="text-center py-20 animate-fade-in">
+            <p class="text-2xl text-gray-500 mb-6">Pet not found</p>
+            <button
+              routerLink="/"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+            >
+              Return to Pet List
+            </button>
+          </div>
+        }
       </div>
     </div>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetDetailComponent implements OnInit {
   pet$!: Observable<Pet | undefined>;
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private petService: PetService
-  ) {}
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private petService = inject(PetService);
 
   ngOnInit(): void {
     this.pet$ = this.route.paramMap.pipe(

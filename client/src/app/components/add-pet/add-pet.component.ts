@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PetService } from '../../services/pet.service';
@@ -7,8 +7,7 @@ import { Pet } from '../../models/pet.model';
 
 @Component({
   selector: 'app-add-pet',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage],
   template: `
     <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto">
@@ -36,13 +35,12 @@ import { Pet } from '../../models/pet.model';
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="Enter pet name"
               />
-              <div
-                *ngIf="petForm.get('name')?.invalid && petForm.get('name')?.touched"
-                class="mt-1 text-sm text-red-600"
-              >
-                <span *ngIf="petForm.get('name')?.errors?.['required']">Name is required.</span>
-                <span *ngIf="petForm.get('name')?.errors?.['minlength']">Name must be at least 2 characters.</span>
-              </div>
+              @if (petForm.get('name')?.invalid && petForm.get('name')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  @if (petForm.get('name')?.errors?.['required']) {<span>Name is required.</span>}
+                  @if (petForm.get('name')?.errors?.['minlength']) {<span>Name must be at least 2 characters.</span>}
+                </div>
+              }
             </div>
 
             <div>
@@ -57,12 +55,11 @@ import { Pet } from '../../models/pet.model';
                 <option value="cat">Cat</option>
                 <option value="dog">Dog</option>
               </select>
-              <div
-                *ngIf="petForm.get('animalType')?.invalid && petForm.get('animalType')?.touched"
-                class="mt-1 text-sm text-red-600"
-              >
-                Animal type is required.
-              </div>
+              @if (petForm.get('animalType')?.invalid && petForm.get('animalType')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  Animal type is required.
+                </div>
+              }
             </div>
 
             <div>
@@ -75,12 +72,11 @@ import { Pet } from '../../models/pet.model';
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="Enter breed"
               />
-              <div
-                *ngIf="petForm.get('breed')?.invalid && petForm.get('breed')?.touched"
-                class="mt-1 text-sm text-red-600"
-              >
-                Breed is required.
-              </div>
+              @if (petForm.get('breed')?.invalid && petForm.get('breed')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  Breed is required.
+                </div>
+              }
             </div>
 
             <div>
@@ -107,12 +103,11 @@ import { Pet } from '../../models/pet.model';
                   <span class="ml-2 text-gray-700">Female</span>
                 </label>
               </div>
-              <div
-                *ngIf="petForm.get('gender')?.invalid && petForm.get('gender')?.touched"
-                class="mt-1 text-sm text-red-600"
-              >
-                Gender is required.
-              </div>
+              @if (petForm.get('gender')?.invalid && petForm.get('gender')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  Gender is required.
+                </div>
+              }
             </div>
 
             <div>
@@ -126,13 +121,12 @@ import { Pet } from '../../models/pet.model';
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="Enter age"
               />
-              <div
-                *ngIf="petForm.get('age')?.invalid && petForm.get('age')?.touched"
-                class="mt-1 text-sm text-red-600"
-              >
-                <span *ngIf="petForm.get('age')?.errors?.['required']">Age is required.</span>
-                <span *ngIf="petForm.get('age')?.errors?.['min']">Age must be a positive number.</span>
-              </div>
+              @if (petForm.get('age')?.invalid && petForm.get('age')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  @if (petForm.get('age')?.errors?.['required']) {<span>Age is required.</span>}
+                  @if (petForm.get('age')?.errors?.['min']) {<span>Age must be a positive number.</span>}
+                </div>
+              }
             </div>
 
             <div>
@@ -145,12 +139,11 @@ import { Pet } from '../../models/pet.model';
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="City, State"
               />
-              <div
-                *ngIf="petForm.get('location')?.invalid && petForm.get('location')?.touched"
-                class="mt-1 text-sm text-red-600"
-              >
-                Location is required.
-              </div>
+              @if (petForm.get('location')?.invalid && petForm.get('location')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  Location is required.
+                </div>
+              }
             </div>
 
             <div>
@@ -162,12 +155,11 @@ import { Pet } from '../../models/pet.model';
                 formControlName="adoptionDate"
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               />
-              <div
-                *ngIf="petForm.get('adoptionDate')?.invalid && petForm.get('adoptionDate')?.touched"
-                class="mt-1 text-sm text-red-600"
-              >
-                Adoption date is required.
-              </div>
+              @if (petForm.get('adoptionDate')?.invalid && petForm.get('adoptionDate')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  Adoption date is required.
+                </div>
+              }
             </div>
 
             <div>
@@ -181,22 +173,25 @@ import { Pet } from '../../models/pet.model';
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="https://example.com/image.jpg"
               />
-              <div
-                *ngIf="petForm.get('imageUrl')?.invalid && petForm.get('imageUrl')?.touched"
-                class="mt-1 text-sm text-red-600"
-              >
-                <span *ngIf="petForm.get('imageUrl')?.errors?.['required']">Image URL is required.</span>
-                <span *ngIf="petForm.get('imageUrl')?.errors?.['pattern']">Please enter a valid URL.</span>
-              </div>
-              <div *ngIf="imagePreview && petForm.get('imageUrl')?.valid" class="mt-4">
-                <p class="text-sm text-gray-600 mb-2">Image Preview:</p>
-                <img
-                  [src]="imagePreview"
-                  alt="Preview"
-                  class="w-full max-w-md rounded-lg shadow-md"
-                  (error)="onImageError()"
-                />
-              </div>
+              @if (petForm.get('imageUrl')?.invalid && petForm.get('imageUrl')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  @if (petForm.get('imageUrl')?.errors?.['required']) {<span>Image URL is required.</span>}
+                  @if (petForm.get('imageUrl')?.errors?.['pattern']) {<span>Please enter a valid URL.</span>}
+                </div>
+              }
+              @if (imagePreview && petForm.get('imageUrl')?.valid) {
+                <div class="mt-4">
+                  <p class="text-sm text-gray-600 mb-2">Image Preview:</p>
+                  <img
+                    ngSrc="{{ imagePreview }}"
+                    alt="Preview"
+                    width="640"
+                    height="400"
+                    class="w-full max-w-md rounded-lg shadow-md"
+                    (error)="onImageError()"
+                  />
+                </div>
+              }
             </div>
 
             <div>
@@ -233,18 +228,19 @@ import { Pet } from '../../models/pet.model';
       </div>
     </div>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddPetComponent {
   petForm: FormGroup;
   imagePreview: string = '';
   isSubmitting: boolean = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private petService: PetService,
-    private router: Router
-  ) {
+  private fb = inject(FormBuilder);
+  private petService = inject(PetService);
+  private router = inject(Router);
+
+  constructor() {
     this.petForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       animalType: ['', Validators.required],

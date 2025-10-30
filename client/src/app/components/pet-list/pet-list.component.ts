@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { PetService } from '../../services/pet.service';
@@ -7,7 +7,6 @@ import { PetCardComponent } from '../pet-card/pet-card.component';
 
 @Component({
   selector: 'app-pet-list',
-  standalone: true,
   imports: [CommonModule, PetCardComponent],
   template: `
     <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
@@ -105,32 +104,31 @@ import { PetCardComponent } from '../pet-card/pet-card.component';
           </div>
         </div>
 
-        <div
-          *ngIf="(filteredPets$ | async)?.length === 0"
-          class="text-center py-16 animate-fade-in"
-        >
-          <p class="text-2xl text-gray-500">
-            No pets match your current filters. Try adjusting your search!
-          </p>
-        </div>
+        @if ((filteredPets$ | async)?.length === 0) {
+          <div class="text-center py-16 animate-fade-in">
+            <p class="text-2xl text-gray-500">
+              No pets match your current filters. Try adjusting your search!
+            </p>
+          </div>
+        }
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <app-pet-card
-            *ngFor="let pet of filteredPets$ | async"
-            [pet]="pet"
-          ></app-pet-card>
+          @for (pet of (filteredPets$ | async); track pet.id) {
+            <app-pet-card [pet]="pet"></app-pet-card>
+          }
         </div>
       </div>
     </div>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetListComponent implements OnInit {
   filteredPets$!: Observable<Pet[]>;
   currentAnimalType: AnimalTypeFilter = 'all';
   currentGender: GenderFilter = 'all';
 
-  constructor(private petService: PetService) {}
+  private petService = inject(PetService);
 
   ngOnInit(): void {
     this.filteredPets$ = this.petService.filteredPets$;
