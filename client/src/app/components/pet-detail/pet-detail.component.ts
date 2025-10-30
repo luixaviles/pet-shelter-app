@@ -1,125 +1,33 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Observable, switchMap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
+import { TranslatorService } from '../../services/translator.service';
 
 @Component({
   selector: 'app-pet-detail',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
-  template: `
-    <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-5xl mx-auto">
-        <button
-          routerLink="/"
-          class="mb-6 flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200 animate-fade-in"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to All Pets
-        </button>
-
-        <div *ngIf="pet$ | async as pet; else loading" class="animate-fade-in">
-          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="md:flex">
-              <div class="md:w-1/2">
-                <img
-                  [src]="pet.imageUrl"
-                  [alt]="pet.name"
-                  class="w-full h-full object-cover"
-                />
-              </div>
-
-              <div class="md:w-1/2 p-8">
-                <div class="flex items-center justify-between mb-4">
-                  <h1 class="text-4xl font-bold text-gray-800">{{ pet.name }}</h1>
-                  <span class="text-4xl">
-                    {{ pet.animalType === 'cat' ? '🐱' : '🐕' }}
-                  </span>
-                </div>
-
-                <div class="space-y-4 mb-6">
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Animal Type:</span>
-                    <span class="text-gray-600 capitalize">{{ pet.animalType }}</span>
-                  </div>
-
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Breed:</span>
-                    <span class="text-gray-600">{{ pet.breed }}</span>
-                  </div>
-
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Gender:</span>
-                    <span class="text-gray-600 capitalize">{{ pet.gender }}</span>
-                  </div>
-
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Age:</span>
-                    <span class="text-gray-600">{{ pet.age }} {{ pet.age === 1 ? 'year' : 'years' }} old</span>
-                  </div>
-
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Location:</span>
-                    <span class="text-gray-600">{{ pet.location }}</span>
-                  </div>
-
-                  <div class="flex items-center border-b border-gray-200 pb-3">
-                    <span class="font-semibold text-gray-700 w-32">Available From:</span>
-                    <span class="text-gray-600">{{ pet.adoptionDate }}</span>
-                  </div>
-                </div>
-
-                <div class="bg-gray-50 rounded-lg p-5 mb-6">
-                  <h2 class="text-xl font-semibold text-gray-800 mb-3">About {{ pet.name }}</h2>
-                  <p class="text-gray-600 leading-relaxed">{{ pet.description }}</p>
-                </div>
-
-                <button
-                  (click)="onAdopt(pet)"
-                  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
-                >
-                  Adopt {{ pet.name }} Today!
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <ng-template #loading>
-          <div class="flex items-center justify-center py-20 animate-fade-in">
-            <div class="text-center">
-              <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary-500 mb-4"></div>
-              <p class="text-xl text-gray-600">Loading pet details...</p>
-            </div>
-          </div>
-        </ng-template>
-
-        <div *ngIf="!(pet$ | async)" class="text-center py-20 animate-fade-in">
-          <p class="text-2xl text-gray-500 mb-6">Pet not found</p>
-          <button
-            routerLink="/"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-          >
-            Return to Pet List
-          </button>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: []
+  imports: [CommonModule, RouterLink, NgOptimizedImage, FormsModule],
+  templateUrl: './pet-detail.component.html',
+  styleUrls: ['./pet-detail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PetDetailComponent implements OnInit {
   pet$!: Observable<Pet | undefined>;
+  selectedLanguage: 'en' | 'es' | 'fr' = 'en';
+  translatedDescription: string | null = null;
+  isTranslating: boolean = false;
+  translationProgress: number = 0;
+  translationError: string | null = null;
+  originalDescription: string = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private petService: PetService
-  ) {}
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private petService = inject(PetService);
+  private translatorService = inject(TranslatorService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.pet$ = this.route.paramMap.pipe(
@@ -130,8 +38,72 @@ export class PetDetailComponent implements OnInit {
           return [];
         }
         return this.petService.getPetById(id);
+      }),
+      tap(pet => {
+        if (pet?.description) {
+          this.originalDescription = pet.description;
+          this.cdr.markForCheck();
+        }
       })
     );
+  }
+
+  onLanguageChange(newLanguage: 'en' | 'es' | 'fr', pet: Pet): void {
+    this.selectedLanguage = newLanguage;
+    this.translationError = null;
+    
+    if (newLanguage === 'en') {
+      // Show original description for English
+      this.translatedDescription = null;
+      this.cdr.markForCheck();
+    } else {
+      // Translate to the selected language
+      this.translateDescription(pet, newLanguage);
+    }
+  }
+
+  async translateDescription(pet: Pet, targetLanguage: string): Promise<void> {
+    if (!pet.description || this.isTranslating) {
+      return;
+    }
+
+    this.isTranslating = true;
+    this.translationProgress = 0;
+    this.translationError = null;
+    this.cdr.markForCheck();
+
+    try {
+      // Check if Translator API is available
+      if (!this.translatorService.isTranslatorAvailable()) {
+        throw new Error('Translator API is not available in this browser.');
+      }
+
+      const sourceLanguage = 'en'; // Pet descriptions are always in English initially
+
+      // Translate with progress monitoring
+      const translated = await this.translatorService.translateText(
+        this.originalDescription || pet.description,
+        sourceLanguage,
+        targetLanguage,
+        (progress) => {
+          this.translationProgress = progress;
+          this.cdr.markForCheck();
+        }
+      );
+
+      this.translatedDescription = translated;
+      console.log('[Translation]', { sourceLanguage, targetLanguage, translated });
+    } catch (err: any) {
+      const message = err?.message || 'Failed to translate description. Please try again.';
+      this.translationError = message;
+      console.error('[Translation][error]', err);
+      // Keep original description visible on error
+      this.translatedDescription = null;
+    } finally {
+      this.isTranslating = false;
+      this.translationProgress = 0;
+      this.cdr.markForCheck();
+    }
   }
 
   onAdopt(pet: Pet): void {

@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { PetService } from './services/pet.service';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink],
   template: `
     <div class="min-h-screen">
@@ -36,13 +35,14 @@ import { PetService } from './services/pet.service';
                 </div>
               </label>
 
-              <a
-                *ngIf="petService.isAdminMode()"
-                routerLink="/add-pet"
-                class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md animate-scale-in"
-              >
-                + Add New Pet
-              </a>
+              @if (petService.isAdminMode()) {
+                <a
+                  routerLink="/add-pet"
+                  class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md animate-scale-in"
+                >
+                  + Add New Pet
+                </a>
+              }
             </div>
           </div>
         </div>
@@ -62,8 +62,9 @@ import { PetService } from './services/pet.service';
       </footer>
     </div>
   `,
-  styles: []
+  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
-  constructor(public petService: PetService) {}
+  public petService = inject(PetService);
 }
