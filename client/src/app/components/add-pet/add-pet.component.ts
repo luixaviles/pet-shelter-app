@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -24,6 +24,7 @@ export class AddPetComponent {
   private fb = inject(FormBuilder);
   private petService = inject(PetService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   constructor() {
     this.petForm = this.fb.group({
@@ -42,11 +43,13 @@ export class AddPetComponent {
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     this.isDragOver = true;
+    this.cdr.markForCheck();
   }
 
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
     this.isDragOver = false;
+    this.cdr.markForCheck();
   }
 
   onDrop(event: DragEvent): void {
@@ -72,10 +75,12 @@ export class AddPetComponent {
     this.imageError = null;
     if (!file.type.startsWith('image/')) {
       this.imageError = 'Only image files are allowed.';
+      this.cdr.markForCheck();
       return;
     }
     if (file.size > AddPetComponent.MAX_IMAGE_BYTES) {
       this.imageError = 'Image is too large (max 5MB).';
+      this.cdr.markForCheck();
       return;
     }
     this.loadFileAsDataUrl(file)
@@ -84,9 +89,11 @@ export class AddPetComponent {
         this.petForm.get('imageUrl')?.setValue(dataUrl);
         this.petForm.get('imageUrl')?.markAsDirty();
         this.petForm.get('imageUrl')?.markAsTouched();
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.imageError = 'Failed to load image. Please try a different file.';
+        this.cdr.markForCheck();
       });
   }
 
@@ -104,6 +111,7 @@ export class AddPetComponent {
     this.petForm.get('imageUrl')?.setValue('');
     this.petForm.get('imageUrl')?.markAsDirty();
     this.petForm.get('imageUrl')?.markAsTouched();
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {
