@@ -186,19 +186,47 @@
 
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Age (years) <span class="text-red-500">*</span>
+            Age <span class="text-red-500">*</span>
           </label>
-          <input
-            type="number"
-            formControlName="age"
-            min="0"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-            placeholder="Enter age"
-          />
-          @if (petForm.get('age')?.invalid && petForm.get('age')?.touched) {
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <label class="block text-xs text-gray-600 mb-1">Years</label>
+              <input
+                type="number"
+                formControlName="ageYears"
+                min="0"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                placeholder="0"
+              />
+              @if (petForm.get('ageYears')?.invalid && petForm.get('ageYears')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  @if (petForm.get('ageYears')?.errors?.['required']) {<span>Years is required.</span>}
+                  @if (petForm.get('ageYears')?.errors?.['min']) {<span>Years must be 0 or greater.</span>}
+                </div>
+              }
+            </div>
+            <div class="flex-1">
+              <label class="block text-xs text-gray-600 mb-1">Months</label>
+              <input
+                type="number"
+                formControlName="ageMonths"
+                min="0"
+                max="11"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                placeholder="0"
+              />
+              @if (petForm.get('ageMonths')?.invalid && petForm.get('ageMonths')?.touched) {
+                <div class="mt-1 text-sm text-red-600">
+                  @if (petForm.get('ageMonths')?.errors?.['required']) {<span>Months is required.</span>}
+                  @if (petForm.get('ageMonths')?.errors?.['min']) {<span>Months must be 0 or greater.</span>}
+                  @if (petForm.get('ageMonths')?.errors?.['max']) {<span>Months must be 11 or less.</span>}
+                </div>
+              }
+            </div>
+          </div>
+          @if (petForm.errors?.['ageRequired'] && (petForm.get('ageYears')?.touched || petForm.get('ageMonths')?.touched)) {
             <div class="mt-1 text-sm text-red-600">
-              @if (petForm.get('age')?.errors?.['required']) {<span>Age is required.</span>}
-              @if (petForm.get('age')?.errors?.['min']) {<span>Age must be a positive number.</span>}
+              At least one of years or months must be greater than 0.
             </div>
           }
         </div>

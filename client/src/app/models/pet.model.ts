@@ -4,7 +4,7 @@ export interface Pet {
   animalType: 'cat' | 'dog';
   breed: string;
   gender: 'male' | 'female';
-  age: number;
+  age: { years: number; months: number };
   location: string;
   adoptionDate: string;
   imageUrl: string;

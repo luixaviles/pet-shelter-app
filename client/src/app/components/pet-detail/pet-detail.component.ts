@@ -109,4 +109,15 @@ export class PetDetailComponent implements OnInit {
   onAdopt(pet: Pet): void {
     alert(`Thank you for your interest in adopting ${pet.name}! Our adoption team will contact you within 24 hours to begin the process.`);
   }
+
+  formatAge(age: { years: number; months: number }): string {
+    const parts: string[] = [];
+    if (age.years > 0) {
+      parts.push(`${age.years} ${age.years === 1 ? 'year' : 'years'}`);
+    }
+    if (age.months > 0) {
+      parts.push(`${age.months} ${age.months === 1 ? 'month' : 'months'}`);
+    }
+    return parts.length > 0 ? parts.join(' ') : '0 months';
+  }
 }

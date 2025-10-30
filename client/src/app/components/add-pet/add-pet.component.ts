@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
@@ -44,13 +44,29 @@ export class AddPetComponent {
       animalType: ['', Validators.required],
       breed: ['', Validators.required],
       gender: ['', Validators.required],
-      age: ['', [Validators.required, Validators.min(0)]],
+      ageYears: ['', [Validators.required, Validators.min(0)]],
+      ageMonths: ['', [Validators.required, Validators.min(0), Validators.max(11)]],
       location: ['', Validators.required],
       adoptionDate: ['', Validators.required],
       imageUrl: ['', [Validators.required]],
       description: ['']
-    });
+    }, { validators: this.ageValidator });
   }
+
+  private ageValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    const years = control.get('ageYears')?.value;
+    const months = control.get('ageMonths')?.value;
+    if ((years === null || years === undefined || years === '') && 
+        (months === null || months === undefined || months === '')) {
+      return null; // Let required validators handle empty values
+    }
+    const yearsNum = Number(years);
+    const monthsNum = Number(months);
+    if ((yearsNum === 0 || isNaN(yearsNum)) && (monthsNum === 0 || isNaN(monthsNum))) {
+      return { ageRequired: true };
+    }
+    return null;
+  };
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -127,7 +143,8 @@ export class AddPetComponent {
       animalType: '',
       breed: '',
       gender: '',
-      age: '',
+      ageYears: '',
+      ageMonths: '',
       location: '',
       adoptionDate: '',
       description: ''
@@ -203,8 +220,9 @@ export class AddPetComponent {
           setIfEmpty('gender', normalizedGender);
         }
       }
-      if (typeof result.age === 'number' && result.age >= 0) {
-        setIfEmpty('age', Math.round(result.age));
+      if (typeof result.age === 'object') { 
+        setIfEmpty('ageYears', result.age?.years ?? 0);
+        setIfEmpty('ageMonths', result.age?.months ?? 0);
       }
       if (result.name) {
         setIfEmpty('name', result.name);
@@ -257,7 +275,18 @@ export class AddPetComponent {
       if (formVals.animalType) contextParts.push(`Animal: ${formVals.animalType}`);
       if (formVals.breed) contextParts.push(`Breed: ${formVals.breed}`);
       if (formVals.gender) contextParts.push(`Gender: ${formVals.gender}`);
-      if (formVals.age !== undefined && formVals.age !== null && String(formVals.age) !== '') contextParts.push(`Age: ${formVals.age}`);
+      const ageYears = formVals.ageYears !== undefined && formVals.ageYears !== null && String(formVals.ageYears) !== '' ? Number(formVals.ageYears) : 0;
+      const ageMonths = formVals.ageMonths !== undefined && formVals.ageMonths !== null && String(formVals.ageMonths) !== '' ? Number(formVals.ageMonths) : 0;
+      if (ageYears > 0 || ageMonths > 0) {
+        const ageParts: string[] = [];
+        if (ageYears > 0) {
+          ageParts.push(`${ageYears} ${ageYears === 1 ? 'year' : 'years'}`);
+        }
+        if (ageMonths > 0) {
+          ageParts.push(`${ageMonths} ${ageMonths === 1 ? 'month' : 'months'}`);
+        }
+        contextParts.push(`Age: ${ageParts.join(' ')}`);
+      }
       const context = contextParts.join('\n');
 
       const improved = await this.writerAssist.improveDescription({ current, context });
@@ -279,9 +308,21 @@ export class AddPetComponent {
     if (this.petForm.valid) {
       this.isSubmitting = true;
 
+      const formValue = this.petForm.value;
+      const ageYears = Number(formValue.ageYears) || 0;
+      const ageMonths = Number(formValue.ageMonths) || 0;
+
       const newPet: Pet = {
         id: '',
-        ...this.petForm.value
+        name: formValue.name,
+        animalType: formValue.animalType,
+        breed: formValue.breed,
+        gender: formValue.gender,
+        age: { years: ageYears, months: ageMonths },
+        location: formValue.location,
+        adoptionDate: formValue.adoptionDate,
+        imageUrl: formValue.imageUrl,
+        description: formValue.description || ''
       };
 
       this.petService.addPet(newPet);
