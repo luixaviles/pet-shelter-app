@@ -18,6 +18,11 @@ export class AddPetComponent {
   isSubmitting: boolean = false;
   isDragOver: boolean = false;
   imageError: string | null = null;
+  // AI Autofill UI state (skeleton – service wiring added later)
+  isAiLoading: boolean = false;
+  aiSummary: string | null = null;
+  aiError: string | null = null;
+  allowOverwrite: boolean = false;
 
   private static readonly MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
 
@@ -112,6 +117,32 @@ export class AddPetComponent {
     this.petForm.get('imageUrl')?.markAsDirty();
     this.petForm.get('imageUrl')?.markAsTouched();
     this.cdr.markForCheck();
+  }
+
+  // UX-only: placeholder for AI Autofill action; service integration in next step
+  onAiAutofillClick(): void {
+    if (!this.imagePreview || this.isAiLoading) {
+      return;
+    }
+    this.aiError = null;
+    this.aiSummary = null;
+    this.isAiLoading = true;
+    this.cdr.markForCheck();
+    // Placeholder: will be replaced by AiAssistService call
+    setTimeout(() => {
+      this.isAiLoading = false;
+      this.aiSummary = 'AI suggestions ready (service not yet connected).';
+      this.cdr.markForCheck();
+    }, 300);
+  }
+
+  dismissAiSummary(): void {
+    this.aiSummary = null;
+    this.cdr.markForCheck();
+  }
+
+  retryAiAutofill(): void {
+    this.onAiAutofillClick();
   }
 
   onSubmit(): void {

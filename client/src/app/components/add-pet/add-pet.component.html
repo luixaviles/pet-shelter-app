@@ -61,6 +61,38 @@
                 height="400"
                 class="w-full max-w-md rounded-lg shadow-md mx-auto"
               />
+              <div class="mt-4 flex items-center gap-3">
+                <button
+                  type="button"
+                  aria-label="Autofill from image using AI"
+                  [disabled]="!imagePreview || isAiLoading"
+                  (click)="onAiAutofillClick()"
+                  [attr.aria-busy]="isAiLoading"
+                  class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
+                >
+                  @if (isAiLoading) {
+                    <span class="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    <span>Analyzing image…</span>
+                  } @else {
+                    <span>Autofill from Image (AI)</span>
+                  }
+                </button>
+                <label class="flex items-center gap-2 text-sm text-gray-600">
+                  <span class="text-xs">Processes your image to suggest fields. You can edit before saving.</span>
+                </label>
+              </div>
+              @if (aiError) {
+                <div class="mt-3 bg-red-50 text-red-700 border border-red-200 rounded-lg p-3 text-sm flex items-center justify-between">
+                  <span>{{ aiError }}</span>
+                  <button type="button" (click)="retryAiAutofill()" class="underline font-semibold">Retry</button>
+                </div>
+              }
+              @if (aiSummary) {
+                <div class="mt-3 bg-blue-50 text-blue-800 border border-blue-200 rounded-lg p-3 text-sm flex items-center justify-between">
+                  <span>{{ aiSummary }}</span>
+                  <button type="button" (click)="dismissAiSummary()" class="underline font-semibold">Dismiss</button>
+                </div>
+              }
             </div>
           }
         </section>

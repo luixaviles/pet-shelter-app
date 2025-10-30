@@ -1,5 +1,9 @@
-:host {
-  /* Scoped styles placeholder for add-pet */
+/* Scoped styles placeholder for add-pet */
+
+:host .ai-updated-field {
+  /* temporary highlight ring for fields updated by AI (used in next step) */
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
 }
 
 
