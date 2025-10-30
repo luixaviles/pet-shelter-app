@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
 import { AiAssistService, PetImageAnalysis } from '../../services/ai-assist.service';
+import { WriterAssistService } from '../../services/writer-assist.service';
 
 @Component({
   selector: 'app-add-pet',
@@ -24,6 +25,9 @@ export class AddPetComponent {
   aiSummary: string | null = null;
   aiError: string | null = null;
   allowOverwrite: boolean = false;
+  isImprovingDescription: boolean = false;
+  improveDescError: string | null = null;
+  private lastAiResult: PetImageAnalysis | null = null;
 
   private static readonly MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
 
@@ -32,6 +36,7 @@ export class AddPetComponent {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private aiAssist = inject(AiAssistService);
+  private writerAssist = inject(WriterAssistService);
 
   constructor() {
     this.petForm = this.fb.group({
@@ -137,6 +142,7 @@ export class AddPetComponent {
       const result: PetImageAnalysis = await this.aiAssist.analyzePetImage(this.imagePreview);
       // Required output: log to console for now
       console.log('[Autofill]', result);
+      this.lastAiResult = result;
       const label = result.animal && result.animal !== 'unknown' ? result.animal : 'unknown animal';
       const breed = result.breed || 'unknown breed';
       this.aiSummary = `Detected: ${label} • ${breed}`;
@@ -197,6 +203,46 @@ export class AddPetComponent {
 
   retryAiAutofill(): void {
     this.onAiAutofillClick();
+  }
+
+  async onImproveDescriptionClick(): Promise<void> {
+    const control = this.petForm.get('description');
+    const current = String(control?.value ?? '').trim();
+    if (!current || current.length < 10 || this.isImprovingDescription) {
+      return;
+    }
+    this.improveDescError = null;
+    this.isImprovingDescription = true;
+    this.cdr.markForCheck();
+
+    try {
+      const availability = await this.writerAssist.isWriterAvailable();
+      if (availability === 'unavailable') {
+        throw new Error('Writer API unavailable. Enable the Writer API or use a supported Chrome version.');
+      }
+      const formVals = this.petForm.value as any;
+      const contextParts: string[] = [];
+      if (this.lastAiResult?.description) contextParts.push(`AI notes: ${this.lastAiResult.description}`);
+      if (formVals.name) contextParts.push(`Name: ${formVals.name}`);
+      if (formVals.animalType) contextParts.push(`Animal: ${formVals.animalType}`);
+      if (formVals.breed) contextParts.push(`Breed: ${formVals.breed}`);
+      if (formVals.gender) contextParts.push(`Gender: ${formVals.gender}`);
+      if (formVals.age !== undefined && formVals.age !== null && String(formVals.age) !== '') contextParts.push(`Age: ${formVals.age}`);
+      const context = contextParts.join('\n');
+
+      const improved = await this.writerAssist.improveDescription({ current, context });
+      console.log('[Improve Description]', improved);
+      control?.setValue(improved);
+      control?.markAsDirty();
+      control?.markAsTouched();
+    } catch (err: any) {
+      const message = err?.message || 'Failed to improve description. Please try again.';
+      this.improveDescError = message;
+      console.error('[Improve Description][error]', err);
+    } finally {
+      this.isImprovingDescription = false;
+      this.cdr.markForCheck();
+    }
   }
 
   onSubmit(): void {
