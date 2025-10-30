@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
+import { AiAssistService, PetImageAnalysis } from '../../services/ai-assist.service';
 
 @Component({
   selector: 'app-add-pet',
@@ -30,6 +31,7 @@ export class AddPetComponent {
   private petService = inject(PetService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private aiAssist = inject(AiAssistService);
 
   constructor() {
     this.petForm = this.fb.group({
@@ -119,8 +121,7 @@ export class AddPetComponent {
     this.cdr.markForCheck();
   }
 
-  // UX-only: placeholder for AI Autofill action; service integration in next step
-  onAiAutofillClick(): void {
+  async onAiAutofillClick(): Promise<void> {
     if (!this.imagePreview || this.isAiLoading) {
       return;
     }
@@ -128,12 +129,25 @@ export class AddPetComponent {
     this.aiSummary = null;
     this.isAiLoading = true;
     this.cdr.markForCheck();
-    // Placeholder: will be replaced by AiAssistService call
-    setTimeout(() => {
+
+    try {
+      if (!this.aiAssist.isPromptApiAvailable()) {
+        throw new Error('Chrome Prompt API with image input is unavailable.');
+      }
+      const result: PetImageAnalysis = await this.aiAssist.analyzePetImage(this.imagePreview);
+      // Required output: log to console for now
+      console.log('[Autofill]', result);
+      const label = result.animal && result.animal !== 'unknown' ? result.animal : 'unknown animal';
+      const breed = result.breed || 'unknown breed';
+      this.aiSummary = `Detected: ${label} • ${breed}`;
+    } catch (err: any) {
+      const message = err?.message || 'Failed to analyze image. Please try again.';
+      this.aiError = message;
+      console.error('[Autofill][error]', err);
+    } finally {
       this.isAiLoading = false;
-      this.aiSummary = 'AI suggestions ready (service not yet connected).';
       this.cdr.markForCheck();
-    }, 300);
+    }
   }
 
   dismissAiSummary(): void {
