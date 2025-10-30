@@ -140,6 +140,46 @@ export class AddPetComponent {
       const label = result.animal && result.animal !== 'unknown' ? result.animal : 'unknown animal';
       const breed = result.breed || 'unknown breed';
       this.aiSummary = `Detected: ${label} • ${breed}`;
+
+      // Populate form fields (fill empty fields; do not overwrite user's entries)
+      const form = this.petForm;
+      const setIfEmpty = (controlName: string, value: any) => {
+        const control = form.get(controlName);
+        if (!control) { return; }
+        const current = control.value;
+        if (current === null || current === undefined || String(current).trim() === '') {
+          control.setValue(value);
+          control.markAsDirty();
+          control.markAsTouched();
+        }
+      };
+
+      if (result.animal === 'cat' || result.animal === 'dog') {
+        setIfEmpty('animalType', result.animal);
+      }
+      if (result.breed) {
+        setIfEmpty('breed', result.breed);
+      }
+      if (result.gender) {
+        const normalizedGender = String(result.gender).toLowerCase().includes('female') ? 'female'
+          : String(result.gender).toLowerCase().includes('male') ? 'male' : null;
+        if (normalizedGender) {
+          setIfEmpty('gender', normalizedGender);
+        }
+      }
+      if (typeof result.age === 'number' && result.age >= 0) {
+        setIfEmpty('age', Math.round(result.age));
+      }
+      if (result.name) {
+        setIfEmpty('name', result.name);
+      }
+
+      // Default adoptionDate to today if empty
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      setIfEmpty('adoptionDate', `${yyyy}-${mm}-${dd}`);
     } catch (err: any) {
       const message = err?.message || 'Failed to analyze image. Please try again.';
       this.aiError = message;
