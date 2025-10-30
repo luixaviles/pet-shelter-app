@@ -44,7 +44,7 @@
       </div>
       <div class="flex items-center">
         <span class="font-semibold mr-2">Available:</span>
-        <span>{{ pet().adoptionDate }}</span>
+        <span>{{ pet().adoptionDate | date: 'MMM d, y' }}</span>
       </div>
     </div>
 
