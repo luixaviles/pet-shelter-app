@@ -15,13 +15,23 @@
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div class="md:flex">
             <div class="md:w-1/2">
-              <img
-                ngSrc="{{ pet.imageUrl }}"
-                [alt]="pet.name"
-                width="900"
-                height="700"
-                class="w-full h-full object-cover"
-              />
+              @if (pet.imageUrl?.startsWith('data:')) {
+                <img
+                  [src]="pet.imageUrl"
+                  [alt]="pet.name"
+                  width="900"
+                  height="700"
+                  class="w-full h-full object-cover"
+                />
+              } @else {
+                <img
+                  ngSrc="{{ pet.imageUrl }}"
+                  [alt]="pet.name"
+                  width="900"
+                  height="700"
+                  class="w-full h-full object-cover"
+                />
+              }
             </div>
 
             <div class="md:w-1/2 p-8">

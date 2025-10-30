@@ -16,6 +16,10 @@ export class AddPetComponent {
   petForm: FormGroup;
   imagePreview: string = '';
   isSubmitting: boolean = false;
+  isDragOver: boolean = false;
+  imageError: string | null = null;
+
+  private static readonly MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
 
   private fb = inject(FormBuilder);
   private petService = inject(PetService);
@@ -30,22 +34,76 @@ export class AddPetComponent {
       age: ['', [Validators.required, Validators.min(0)]],
       location: ['', Validators.required],
       adoptionDate: ['', Validators.required],
-      imageUrl: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
+      imageUrl: ['', [Validators.required]],
       description: ['']
     });
   }
 
-  updateImagePreview(): void {
-    const imageUrl = this.petForm.get('imageUrl')?.value;
-    if (imageUrl && this.petForm.get('imageUrl')?.valid) {
-      this.imagePreview = imageUrl;
-    } else {
-      this.imagePreview = '';
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragOver = false;
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      this.handleSelectedFile(file);
     }
   }
 
-  onImageError(): void {
+  onFileInputChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    if (file) {
+      this.handleSelectedFile(file);
+      // reset input so selecting the same file again triggers change
+      input.value = '';
+    }
+  }
+
+  private handleSelectedFile(file: File): void {
+    this.imageError = null;
+    if (!file.type.startsWith('image/')) {
+      this.imageError = 'Only image files are allowed.';
+      return;
+    }
+    if (file.size > AddPetComponent.MAX_IMAGE_BYTES) {
+      this.imageError = 'Image is too large (max 5MB).';
+      return;
+    }
+    this.loadFileAsDataUrl(file)
+      .then(dataUrl => {
+        this.imagePreview = dataUrl;
+        this.petForm.get('imageUrl')?.setValue(dataUrl);
+        this.petForm.get('imageUrl')?.markAsDirty();
+        this.petForm.get('imageUrl')?.markAsTouched();
+      })
+      .catch(() => {
+        this.imageError = 'Failed to load image. Please try a different file.';
+      });
+  }
+
+  private loadFileAsDataUrl(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  removeImage(): void {
     this.imagePreview = '';
+    this.petForm.get('imageUrl')?.setValue('');
+    this.petForm.get('imageUrl')?.markAsDirty();
+    this.petForm.get('imageUrl')?.markAsTouched();
   }
 
   onSubmit(): void {
