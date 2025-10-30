@@ -95,6 +95,13 @@ export class AddPetComponent {
       this.cdr.markForCheck();
       return;
     }
+    
+    // Reset form fields when a new valid image is loaded (except imageUrl which will be set below)
+    // Only reset if there was a previous image, to avoid clearing manually entered data on first load
+    if (this.imagePreview) {
+      this.resetFormFields();
+    }
+    
     this.loadFileAsDataUrl(file)
       .then(dataUrl => {
         this.imagePreview = dataUrl;
@@ -107,6 +114,29 @@ export class AddPetComponent {
         this.imageError = 'Failed to load image. Please try a different file.';
         this.cdr.markForCheck();
       });
+  }
+
+  private resetFormFields(): void {
+    // Store current imageUrl to preserve it
+    const currentImageUrl = this.petForm.get('imageUrl')?.value;
+    
+    // Reset form with empty values, preserving imageUrl
+    this.petForm.reset({
+      imageUrl: currentImageUrl || '',
+      name: '',
+      animalType: '',
+      breed: '',
+      gender: '',
+      age: '',
+      location: '',
+      adoptionDate: '',
+      description: ''
+    });
+    
+    // Reset AI-related state
+    this.aiSummary = null;
+    this.aiError = null;
+    this.lastAiResult = null;
   }
 
   private loadFileAsDataUrl(file: File): Promise<string> {
