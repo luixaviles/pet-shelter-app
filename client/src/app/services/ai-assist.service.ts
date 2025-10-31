@@ -55,7 +55,6 @@ export class AiAssistService {
     ]);
 
     const rawText = String(response);
-    console.log('[AI Autofill][rawText]', rawText);
 
     // Attempt strict JSON extraction
     let parsed: any = null;
@@ -72,7 +71,6 @@ export class AiAssistService {
         breed: '',
         raw: rawText,
       };
-      console.log('[AI Autofill][fallback]', fallback);
       return fallback;
     }
 
@@ -93,7 +91,6 @@ export class AiAssistService {
       raw: rawText,
     };
 
-    console.log('[AI Autofill][result]', analysis);
     return analysis;
   }
 }

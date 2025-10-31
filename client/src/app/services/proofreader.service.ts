@@ -85,7 +85,7 @@ export class ProofreaderService {
 
     // Proofread the text
     const result = await proofreader.proofread(text.trim());
-    console.log('[Proofread]result', result);
+    console.log('[Proofread]', result);
     const correctedInput = String(result.correctedInput || text);
     return this.stripProofreadPrefix(correctedInput);
   }

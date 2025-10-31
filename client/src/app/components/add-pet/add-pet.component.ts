@@ -341,7 +341,7 @@ export class AddPetComponent {
       const context = contextParts.join('\n');
 
       const improved = await this.writerAssist.improveDescription({ current, context });
-      console.log('[Improve Description]', improved);
+      console.log('[Writer]', improved);
       
       // Update form and state within Angular's zone
       this.ngZone.run(() => {

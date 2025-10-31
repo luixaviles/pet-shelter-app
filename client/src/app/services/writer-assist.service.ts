@@ -15,8 +15,6 @@ export class WriterAssistService {
 
   async improveDescription(params: { current: string; context?: string }): Promise<string> {
     const { current, context } = params;
-    console.log('[Improve Description][current]', current);
-    console.log('[Improve Description][context]', context);
     if (!current || current.trim().length === 0) {
       return current;
     }
