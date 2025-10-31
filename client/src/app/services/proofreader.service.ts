@@ -24,6 +24,20 @@ export class ProofreaderService {
     }
   }
 
+  /**
+   * Strips the "PROOFREAD_TEXT: " prefix from the corrected text if present.
+   * Returns the text unchanged if the prefix is not found.
+   * @param correctedText - The text that may contain the PROOFREAD_TEXT prefix
+   * @returns The text without the prefix, or the original text if prefix is not present
+   */
+  private stripProofreadPrefix(correctedText: string): string {
+    const prefix = 'PROOFREAD_TEXT: ';
+    if (correctedText && correctedText.startsWith(prefix)) {
+      return correctedText.slice(prefix.length);
+    }
+    return correctedText;
+  }
+
   async proofreadText(
     text: string,
     onProgress?: (progress: number) => void
@@ -72,7 +86,8 @@ export class ProofreaderService {
     // Proofread the text
     const result = await proofreader.proofread(text.trim());
     console.log('[Proofread]result', result);
-    return String(result.correctedInput || text);
+    const correctedInput = String(result.correctedInput || text);
+    return this.stripProofreadPrefix(correctedInput);
   }
 }
 
