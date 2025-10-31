@@ -106,7 +106,7 @@
           <input
             type="text"
             formControlName="name"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
             placeholder="Enter pet name"
           />
           @if (petForm.get('name')?.invalid && petForm.get('name')?.touched) {
@@ -123,7 +123,7 @@
           </label>
           <select
             formControlName="animalType"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
           >
             <option value="">Select animal type</option>
             <option value="cat">Cat</option>
@@ -143,7 +143,7 @@
           <input
             type="text"
             formControlName="breed"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
             placeholder="Enter breed"
           />
           @if (petForm.get('breed')?.invalid && petForm.get('breed')?.touched) {
@@ -195,7 +195,7 @@
                 type="number"
                 formControlName="ageYears"
                 min="0"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
                 placeholder="0"
               />
               @if (petForm.get('ageYears')?.invalid && petForm.get('ageYears')?.touched) {
@@ -212,7 +212,7 @@
                 formControlName="ageMonths"
                 min="0"
                 max="11"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
                 placeholder="0"
               />
               @if (petForm.get('ageMonths')?.invalid && petForm.get('ageMonths')?.touched) {
@@ -238,7 +238,7 @@
           <input
             type="text"
             formControlName="location"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
             placeholder="City, State"
           />
           @if (petForm.get('location')?.invalid && petForm.get('location')?.touched) {
@@ -255,11 +255,17 @@
           <input
             type="date"
             formControlName="adoptionDate"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+            [min]="getTodayDateString()"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
           />
           @if (petForm.get('adoptionDate')?.invalid && petForm.get('adoptionDate')?.touched) {
             <div class="mt-1 text-sm text-red-600">
-              Adoption date is required.
+              @if (petForm.get('adoptionDate')?.errors?.['required']) {
+                <span>Adoption date is required.</span>
+              }
+              @if (petForm.get('adoptionDate')?.errors?.['dateInPast']) {
+                <span>Adoption date cannot be before today.</span>
+              }
             </div>
           }
         </div>

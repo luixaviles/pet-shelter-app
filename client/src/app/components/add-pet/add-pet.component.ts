@@ -51,10 +51,38 @@ export class AddPetComponent {
       ageYears: ['', [Validators.required, Validators.min(0)]],
       ageMonths: ['', [Validators.required, Validators.min(0), Validators.max(11)]],
       location: ['', Validators.required],
-      adoptionDate: ['', Validators.required],
+      adoptionDate: ['', [Validators.required, this.dateNotInPastValidator]],
       imageUrl: [''], // Keep for preview purposes, not for validation
       description: ['']
     }, { validators: this.ageValidator });
+  }
+
+  private dateNotInPastValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) {
+      return null; // Let required validator handle empty values
+    }
+
+    // Parse YYYY-MM-DD string as local date (avoids timezone issues)
+    const [year, month, day] = control.value.split('-').map(Number);
+    const selectedDate = new Date(year, month - 1, day);
+    
+    // Get today in local timezone
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      return { dateInPast: true };
+    }
+    return null;
+  };
+
+  getTodayDateString(): string {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   private ageValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
