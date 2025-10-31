@@ -7,6 +7,7 @@ import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
 import { TranslatorService } from '../../services/translator.service';
 import { AgeFormatPipe } from '../../pipes/age-format.pipe';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-pet-detail',
@@ -29,6 +30,7 @@ export class PetDetailComponent implements OnInit {
   private petService = inject(PetService);
   private translatorService = inject(TranslatorService);
   private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
 
   ngOnInit(): void {
     this.pet$ = this.route.paramMap.pipe(
@@ -108,6 +110,6 @@ export class PetDetailComponent implements OnInit {
   }
 
   onAdopt(pet: Pet): void {
-    alert(`Thank you for your interest in adopting ${pet.name}! Our adoption team will contact you within 24 hours to begin the process.`);
+    this.toastService.success(`Thank you for your interest in adopting ${pet.name}! Our adoption team will contact you within 24 hours to begin the process.`);
   }
 }

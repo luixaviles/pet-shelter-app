@@ -8,6 +8,7 @@ import { AiAssistService, PetImageAnalysis } from '../../services/ai-assist.serv
 import { WriterAssistService } from '../../services/writer-assist.service';
 import { ProofreaderService } from '../../services/proofreader.service';
 import { UserService } from '../../services/user.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-add-pet',
@@ -46,6 +47,7 @@ export class AddPetComponent {
   private writerAssist = inject(WriterAssistService);
   private proofreaderService = inject(ProofreaderService);
   private userService = inject(UserService);
+  private toastService = inject(ToastService);
 
   constructor() {
     this.petForm = this.fb.group({
@@ -453,13 +455,13 @@ export class AddPetComponent {
 
       this.petService.addPet(formData).subscribe({
         next: (createdPet) => {
-          alert(`${createdPet.name} has been successfully added to the adoption list!`);
+          this.toastService.success(`${createdPet.name} has been successfully added to the adoption list!`);
           this.router.navigate(['/']);
         },
         error: (error) => {
           this.isSubmitting = false;
           const errorMessage = error?.error?.error || error?.message || 'Failed to create pet. Please try again.';
-          alert(`Error: ${errorMessage}`);
+          this.toastService.error(`Error: ${errorMessage}`);
           this.cdr.markForCheck();
         }
       });

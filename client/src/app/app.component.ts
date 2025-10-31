@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { PetService } from './services/pet.service';
 import { UserWidgetComponent } from './components/user-widget/user-widget.component';
+import { ToastContainerComponent } from './components/toast-container/toast-container.component';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, RouterLink, UserWidgetComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, UserWidgetComponent, ToastContainerComponent],
   template: `
     <div class="min-h-screen">
       <nav class="bg-white shadow-md sticky top-0 z-50">
@@ -45,6 +46,8 @@ import { UserWidgetComponent } from './components/user-widget/user-widget.compon
           </p>
         </div>
       </footer>
+
+      <app-toast-container></app-toast-container>
     </div>
   `,
   styles: [],

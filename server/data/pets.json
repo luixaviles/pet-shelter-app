@@ -5,7 +5,10 @@
     "animalType": "cat",
     "breed": "Persian",
     "gender": "female",
-    "age": { "years": 2, "months": 0 },
+    "age": {
+      "years": 2,
+      "months": 0
+    },
     "location": "Seattle, WA",
     "adoptionDate": "2025-10-15",
     "imageUrl": "https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -17,7 +20,10 @@
     "animalType": "dog",
     "breed": "Golden Retriever",
     "gender": "male",
-    "age": { "years": 3, "months": 1 },
+    "age": {
+      "years": 3,
+      "months": 1
+    },
     "location": "Portland, OR",
     "adoptionDate": "2025-10-10",
     "imageUrl": "https://images.pexels.com/photos/2253275/pexels-photo-2253275.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -29,7 +35,10 @@
     "animalType": "cat",
     "breed": "Maine Coon",
     "gender": "male",
-    "age": { "years": 4, "months": 5 },
+    "age": {
+      "years": 4,
+      "months": 5
+    },
     "location": "San Francisco, CA",
     "adoptionDate": "2025-10-20",
     "imageUrl": "https://images.pexels.com/photos/2558605/pexels-photo-2558605.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -41,7 +50,10 @@
     "animalType": "dog",
     "breed": "Labrador Retriever",
     "gender": "female",
-    "age": { "years": 5, "months": 0 },
+    "age": {
+      "years": 5,
+      "months": 0
+    },
     "location": "Los Angeles, CA",
     "adoptionDate": "2025-10-12",
     "imageUrl": "https://images.pexels.com/photos/1851164/pexels-photo-1851164.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -53,7 +65,10 @@
     "animalType": "dog",
     "breed": "German Shepherd",
     "gender": "male",
-    "age": { "years": 2, "months": 0 },
+    "age": {
+      "years": 2,
+      "months": 0
+    },
     "location": "Denver, CO",
     "adoptionDate": "2025-10-08",
     "imageUrl": "https://images.pexels.com/photos/1490908/pexels-photo-1490908.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -65,7 +80,10 @@
     "animalType": "cat",
     "breed": "Tabby",
     "gender": "female",
-    "age": { "years": 3, "months": 0 },
+    "age": {
+      "years": 3,
+      "months": 0
+    },
     "location": "Austin, TX",
     "adoptionDate": "2025-10-25",
     "imageUrl": "https://images.pexels.com/photos/1543793/pexels-photo-1543793.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -77,7 +95,10 @@
     "animalType": "dog",
     "breed": "French Bulldog",
     "gender": "female",
-    "age": { "years": 2, "months": 0 },
+    "age": {
+      "years": 2,
+      "months": 0
+    },
     "location": "New York, NY",
     "adoptionDate": "2025-10-16",
     "imageUrl": "https://images.pexels.com/photos/1591939/pexels-photo-1591939.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -89,7 +110,10 @@
     "animalType": "cat",
     "breed": "Russian Blue",
     "gender": "male",
-    "age": { "years": 5, "months": 0 },
+    "age": {
+      "years": 5,
+      "months": 0
+    },
     "location": "Phoenix, AZ",
     "adoptionDate": "2025-10-19",
     "imageUrl": "https://images.pexels.com/photos/1183434/pexels-photo-1183434.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -101,7 +125,10 @@
     "animalType": "dog",
     "breed": "Poodle",
     "gender": "male",
-    "age": { "years": 3, "months": 0 },
+    "age": {
+      "years": 3,
+      "months": 0
+    },
     "location": "San Diego, CA",
     "adoptionDate": "2025-10-11",
     "imageUrl": "https://images.pexels.com/photos/3687770/pexels-photo-3687770.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -113,7 +140,10 @@
     "animalType": "cat",
     "breed": "Ragdoll",
     "gender": "female",
-    "age": { "years": 2, "months": 0 },
+    "age": {
+      "years": 2,
+      "months": 0
+    },
     "location": "Nashville, TN",
     "adoptionDate": "2025-10-17",
     "imageUrl": "https://images.pexels.com/photos/3777622/pexels-photo-3777622.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -125,7 +155,10 @@
     "animalType": "dog",
     "breed": "Boxer",
     "gender": "male",
-    "age": { "years": 4, "months": 0 },
+    "age": {
+      "years": 4,
+      "months": 0
+    },
     "location": "Philadelphia, PA",
     "adoptionDate": "2025-10-13",
     "imageUrl": "https://images.pexels.com/photos/3361739/pexels-photo-3361739.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -137,7 +170,10 @@
     "animalType": "cat",
     "breed": "Orange Tabby",
     "gender": "female",
-    "age": { "years": 4, "months": 0 },
+    "age": {
+      "years": 4,
+      "months": 0
+    },
     "location": "Atlanta, GA",
     "adoptionDate": "2025-10-21",
     "imageUrl": "https://images.pexels.com/photos/2071873/pexels-photo-2071873.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -149,7 +185,10 @@
     "animalType": "dog",
     "breed": "Husky",
     "gender": "male",
-    "age": { "years": 2, "months": 0 },
+    "age": {
+      "years": 2,
+      "months": 0
+    },
     "location": "Minneapolis, MN",
     "adoptionDate": "2025-10-09",
     "imageUrl": "https://images.pexels.com/photos/3726314/pexels-photo-3726314.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -161,7 +200,10 @@
     "animalType": "cat",
     "breed": "Himalayan",
     "gender": "female",
-    "age": { "years": 3, "months": 0 },
+    "age": {
+      "years": 3,
+      "months": 0
+    },
     "location": "Dallas, TX",
     "adoptionDate": "2025-10-23",
     "imageUrl": "https://images.pexels.com/photos/2361952/pexels-photo-2361952.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -173,7 +215,10 @@
     "animalType": "cat",
     "breed": "Scottish Fold",
     "gender": "female",
-    "age": { "years": 2, "months": 0 },
+    "age": {
+      "years": 2,
+      "months": 0
+    },
     "location": "Sacramento, CA",
     "adoptionDate": "2025-10-26",
     "imageUrl": "https://images.pexels.com/photos/1741205/pexels-photo-1741205.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -185,7 +230,10 @@
     "animalType": "dog",
     "breed": "Rottweiler",
     "gender": "male",
-    "age": { "years": 3, "months": 0 },
+    "age": {
+      "years": 3,
+      "months": 0
+    },
     "location": "Las Vegas, NV",
     "adoptionDate": "2025-10-10",
     "imageUrl": "https://images.pexels.com/photos/1629781/pexels-photo-1629781.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -197,10 +245,28 @@
     "animalType": "cat",
     "breed": "Tuxedo",
     "gender": "male",
-    "age": { "years": 1, "months": 0 },
+    "age": {
+      "years": 1,
+      "months": 0
+    },
     "location": "Raleigh, NC",
     "adoptionDate": "2025-10-28",
     "imageUrl": "https://images.pexels.com/photos/1314550/pexels-photo-1314550.jpeg?auto=compress&cs=tinysrgb&w=400",
     "description": "Oreo is a playful tuxedo kitten with classic black and white markings and boundless energy. He loves chasing anything that moves and pouncing on unsuspecting toys. Oreo would do well with another playful cat or an owner who has time for interactive play sessions."
+  },
+  {
+    "name": "Rusty",
+    "animalType": "dog",
+    "breed": "Australian Shepherd",
+    "gender": "male",
+    "age": {
+      "years": 2,
+      "months": 8
+    },
+    "location": "San Francisco, CA",
+    "adoptionDate": "2025-10-31",
+    "imageUrl": "https://storage.googleapis.com/petshelterai.firebasestorage.app/images%2Fdog-P_-bFKA9v5.png",
+    "description": "Meet Rusty, a spirited Australian Shepherd with a captivating blend of white and brown mottled fur and strikingly different-colored eyes. This lively two-year-old male possesses an undeniable charm, radiating an alert and playful energy that will brighten any home. Rusty’s expressive gaze hints at a curious and intelligent spirit, eager to explore new adventures and forge a strong bond with his new family. He enjoys observing the world around him, often captivated by the flickering images of television, suggesting a thoughtful and observant nature.",
+    "id": "22"
   }
 ]

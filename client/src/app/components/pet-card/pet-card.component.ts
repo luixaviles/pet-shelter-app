@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Pet } from '../../models/pet.model';
 import { AgeFormatPipe } from '../../pipes/age-format.pipe';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-pet-card',
@@ -13,8 +14,9 @@ import { AgeFormatPipe } from '../../pipes/age-format.pipe';
 })
 export class PetCardComponent {
   pet = input.required<Pet>();
+  private toastService = inject(ToastService);
 
   onAdopt(): void {
-    alert(`Thank you for your interest in adopting ${this.pet().name}! Our team will contact you soon.`);
+    this.toastService.success(`Thank you for your interest in adopting ${this.pet().name}! Our team will contact you soon.`);
   }
 }
