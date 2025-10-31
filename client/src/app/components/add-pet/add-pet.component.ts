@@ -6,6 +6,7 @@ import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
 import { AiAssistService, PetImageAnalysis } from '../../services/ai-assist.service';
 import { WriterAssistService } from '../../services/writer-assist.service';
+import { ProofreaderService } from '../../services/proofreader.service';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -29,6 +30,9 @@ export class AddPetComponent {
   allowOverwrite: boolean = false;
   isImprovingDescription: boolean = false;
   improveDescError: string | null = null;
+  isProofreading: boolean = false;
+  proofreadProgress: number = 0;
+  proofreadError: string | null = null;
   private lastAiResult: PetImageAnalysis | null = null;
 
   private static readonly MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
@@ -40,6 +44,7 @@ export class AddPetComponent {
   private ngZone = inject(NgZone);
   private aiAssist = inject(AiAssistService);
   private writerAssist = inject(WriterAssistService);
+  private proofreaderService = inject(ProofreaderService);
   private userService = inject(UserService);
 
   constructor() {
@@ -356,6 +361,63 @@ export class AddPetComponent {
       // Ensure state update happens within Angular's zone for proper change detection
       this.ngZone.run(() => {
         this.isImprovingDescription = false;
+        this.cdr.markForCheck();
+      });
+    }
+  }
+
+  async onProofreadClick(): Promise<void> {
+    const control = this.petForm.get('description');
+    const current = String(control?.value ?? '').trim();
+    if (!current || current.length < 10 || this.isProofreading) {
+      return;
+    }
+
+    // Update state within Angular's zone to ensure change detection
+    this.ngZone.run(() => {
+      this.proofreadError = null;
+      this.proofreadProgress = 0;
+      this.isProofreading = true;
+      this.cdr.markForCheck();
+    });
+
+    try {
+      if (!this.proofreaderService.isProofreaderAvailable()) {
+        throw new Error('Proofreader API is not available in this browser.');
+      }
+
+      const corrected = await this.proofreaderService.proofreadText(
+        current,
+        (progress) => {
+          // Update progress within Angular's zone
+          this.ngZone.run(() => {
+            this.proofreadProgress = progress;
+            this.cdr.markForCheck();
+          });
+        }
+      );
+
+      console.log('[Proofread]', corrected);
+
+      // Update form and state within Angular's zone
+      this.ngZone.run(() => {
+        control?.setValue(corrected);
+        control?.markAsDirty();
+        control?.markAsTouched();
+      });
+    } catch (err: any) {
+      const message = err?.message || 'Failed to proofread description. Please try again.';
+      // Update error state within Angular's zone
+      this.ngZone.run(() => {
+        this.proofreadError = message;
+        this.cdr.markForCheck();
+      });
+      console.error('[Proofread][error]', err);
+    } finally {
+      // Ensure state update happens within Angular's zone for proper change detection
+      this.ngZone.run(() => {
+        this.isProofreading = false;
+        this.proofreadProgress = 0;
         this.cdr.markForCheck();
       });
     }

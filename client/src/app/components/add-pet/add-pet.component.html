@@ -278,22 +278,41 @@
               Description
             </label>
             @if ((petForm.get('description')?.value?.length ?? 0) >= 10) {
-              <button
-                type="button"
-                (click)="onImproveDescriptionClick()"
-                [disabled]="isImprovingDescription"
-                class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 disabled:text-gray-400 text-sm font-semibold"
-              >
-                @if (isImprovingDescription) {
-                  <span class="inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
-                  <span>Improve description</span>
-                } @else {
-                  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4 fill-current">
-                    <path d="M11 2l1.5 4.5L17 8l-4.5 1.5L11 14l-1.5-4.5L5 8l4.5-1.5L11 2zm6 8l.75 2.25L20 13l-2.25.75L17 16l-.75-2.25L14 13l2.25-.75L17 10zm-10 3l.5 1.5L9 15l-1.5.5L7 17l-.5-1.5L5 15l1.5-.5L7 13z"/>
-                  </svg>
-                  <span>Improve description</span>
-                }
-              </button>
+              <div class="flex items-center gap-4">
+                <button
+                  type="button"
+                  (click)="onProofreadClick()"
+                  [disabled]="isProofreading"
+                  class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 disabled:text-gray-400 text-sm font-semibold"
+                >
+                  @if (isProofreading) {
+                    <span class="inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+                    <span>Proofread</span>
+                  } @else {
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                    <span>Proofread</span>
+                  }
+                </button>
+                <button
+                  type="button"
+                  (click)="onImproveDescriptionClick()"
+                  [disabled]="isImprovingDescription"
+                  class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 disabled:text-gray-400 text-sm font-semibold"
+                >
+                  @if (isImprovingDescription) {
+                    <span class="inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+                    <span>Improve description</span>
+                  } @else {
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4 fill-current">
+                      <path d="M11 2l1.5 4.5L17 8l-4.5 1.5L11 14l-1.5-4.5L5 8l4.5-1.5L11 2zm6 8l.75 2.25L20 13l-2.25.75L17 16l-.75-2.25L14 13l2.25-.75L17 10zm-10 3l.5 1.5L9 15l-1.5.5L7 17l-.5-1.5L5 15l1.5-.5L7 13z"/>
+                    </svg>
+                    <span>Improve description</span>
+                  }
+                </button>
+              </div>
             }
           </div>
           <textarea
@@ -303,6 +322,21 @@
             placeholder="Tell us about this pet (personality, preferences, etc.)"
           ></textarea>
           <p class="mt-1 text-sm text-gray-500">Optional: 3-4 sentences about the pet</p>
+          @if (isProofreading) {
+            <div class="mt-4 flex items-center gap-3 text-sm text-gray-600">
+              <span class="inline-block h-4 w-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+              @if (proofreadProgress > 0) {
+                <span>Downloading proofreader model... {{ proofreadProgress.toFixed(0) }}%</span>
+              } @else {
+                <span>Proofreading...</span>
+              }
+            </div>
+          }
+          @if (proofreadError) {
+            <div class="mt-2 bg-red-50 text-red-700 border border-red-200 rounded-lg p-2 text-sm">
+              {{ proofreadError }}
+            </div>
+          }
           @if (improveDescError) {
             <div class="mt-2 bg-red-50 text-red-700 border border-red-200 rounded-lg p-2 text-sm">
               {{ improveDescError }}
