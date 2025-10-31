@@ -78,11 +78,8 @@ export class PetService {
     this.genderFilterSubject.next(filter);
   }
 
-  addPet(pet: Pet): Observable<Pet> {
-    // Create DTO without id (server will generate it)
-    const { id, ...petDto } = pet;
-    
-    return this.http.post<ApiResponse<Pet>>(`${environment.apiUrl}/pets`, petDto).pipe(
+  addPet(formData: FormData): Observable<Pet> {
+    return this.http.post<ApiResponse<Pet>>(`${environment.apiUrl}/pets`, formData).pipe(
       map(response => {
         if (response.success && response.data) {
           // Update local state with the new pet from server

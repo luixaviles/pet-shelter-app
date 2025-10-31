@@ -17,6 +17,7 @@ import { WriterAssistService } from '../../services/writer-assist.service';
 export class AddPetComponent {
   petForm: FormGroup;
   imagePreview: string = '';
+  selectedImageFile: File | null = null;
   isSubmitting: boolean = false;
   isDragOver: boolean = false;
   imageError: string | null = null;
@@ -48,7 +49,7 @@ export class AddPetComponent {
       ageMonths: ['', [Validators.required, Validators.min(0), Validators.max(11)]],
       location: ['', Validators.required],
       adoptionDate: ['', Validators.required],
-      imageUrl: ['', [Validators.required]],
+      imageUrl: [''], // Keep for preview purposes, not for validation
       description: ['']
     }, { validators: this.ageValidator });
   }
@@ -112,6 +113,9 @@ export class AddPetComponent {
       return;
     }
     
+    // Store the File object for FormData submission
+    this.selectedImageFile = file;
+    
     // Reset form fields when a new valid image is loaded (except imageUrl which will be set below)
     // Only reset if there was a previous image, to avoid clearing manually entered data on first load
     if (this.imagePreview) {
@@ -128,6 +132,7 @@ export class AddPetComponent {
       })
       .catch(() => {
         this.imageError = 'Failed to load image. Please try a different file.';
+        this.selectedImageFile = null;
         this.cdr.markForCheck();
       });
   }
@@ -154,6 +159,7 @@ export class AddPetComponent {
     this.aiSummary = null;
     this.aiError = null;
     this.lastAiResult = null;
+    // Note: selectedImageFile is not reset here as it's set when a new file is selected
   }
 
   private loadFileAsDataUrl(file: File): Promise<string> {
@@ -167,6 +173,7 @@ export class AddPetComponent {
 
   removeImage(): void {
     this.imagePreview = '';
+    this.selectedImageFile = null;
     this.petForm.get('imageUrl')?.setValue('');
     this.petForm.get('imageUrl')?.markAsDirty();
     this.petForm.get('imageUrl')?.markAsTouched();
@@ -305,6 +312,13 @@ export class AddPetComponent {
   }
 
   onSubmit(): void {
+    // Validate that an image file is selected
+    if (!this.selectedImageFile) {
+      this.imageError = 'Please select an image file.';
+      this.cdr.markForCheck();
+      return;
+    }
+
     if (this.petForm.valid) {
       this.isSubmitting = true;
       this.cdr.markForCheck();
@@ -313,20 +327,19 @@ export class AddPetComponent {
       const ageYears = Number(formValue.ageYears) || 0;
       const ageMonths = Number(formValue.ageMonths) || 0;
 
-      const newPet: Pet = {
-        id: '',
-        name: formValue.name,
-        animalType: formValue.animalType,
-        breed: formValue.breed,
-        gender: formValue.gender,
-        age: { years: ageYears, months: ageMonths },
-        location: formValue.location,
-        adoptionDate: formValue.adoptionDate,
-        imageUrl: formValue.imageUrl,
-        description: formValue.description || ''
-      };
+      // Create FormData for multipart/form-data request
+      const formData = new FormData();
+      formData.append('image', this.selectedImageFile);
+      formData.append('name', formValue.name);
+      formData.append('animalType', formValue.animalType);
+      formData.append('breed', formValue.breed);
+      formData.append('gender', formValue.gender);
+      formData.append('age', JSON.stringify({ years: ageYears, months: ageMonths }));
+      formData.append('location', formValue.location);
+      formData.append('adoptionDate', formValue.adoptionDate);
+      formData.append('description', formValue.description || '');
 
-      this.petService.addPet(newPet).subscribe({
+      this.petService.addPet(formData).subscribe({
         next: (createdPet) => {
           alert(`${createdPet.name} has been successfully added to the adoption list!`);
           this.router.navigate(['/']);
