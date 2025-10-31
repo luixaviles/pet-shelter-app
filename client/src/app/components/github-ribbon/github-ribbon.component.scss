@@ -1,0 +1,29 @@
+.github-ribbon {
+  position: fixed;
+  bottom: 42px;
+  right: -47px;
+  z-index: 60;
+  background-color: #24292e;
+  color: white;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 35px;
+  padding: 0 45px;
+  text-align: center;
+  white-space: nowrap;
+  width: 200px;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s ease;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+
+  // Hide on very small screens
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
+
