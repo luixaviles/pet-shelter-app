@@ -253,20 +253,5 @@
     "adoptionDate": "2025-10-28",
     "imageUrl": "https://images.pexels.com/photos/1314550/pexels-photo-1314550.jpeg?auto=compress&cs=tinysrgb&w=400",
     "description": "Oreo is a playful tuxedo kitten with classic black and white markings and boundless energy. He loves chasing anything that moves and pouncing on unsuspecting toys. Oreo would do well with another playful cat or an owner who has time for interactive play sessions."
-  },
-  {
-    "name": "Rusty",
-    "animalType": "dog",
-    "breed": "Australian Shepherd",
-    "gender": "male",
-    "age": {
-      "years": 2,
-      "months": 8
-    },
-    "location": "San Francisco, CA",
-    "adoptionDate": "2025-10-31",
-    "imageUrl": "https://storage.googleapis.com/petshelterai.firebasestorage.app/images%2Fdog-P_-bFKA9v5.png",
-    "description": "Meet Rusty, a spirited Australian Shepherd with a captivating blend of white and brown mottled fur and strikingly different-colored eyes. This lively two-year-old male possesses an undeniable charm, radiating an alert and playful energy that will brighten any home. Rusty’s expressive gaze hints at a curious and intelligent spirit, eager to explore new adventures and forge a strong bond with his new family. He enjoys observing the world around him, often captivated by the flickering images of television, suggesting a thoughtful and observant nature.",
-    "id": "22"
   }
 ]

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject, NgZone } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -42,7 +42,6 @@ export class AddPetComponent {
   private petService = inject(PetService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
-  private ngZone = inject(NgZone);
   private aiAssist = inject(AiAssistService);
   private writerAssist = inject(WriterAssistService);
   private proofreaderService = inject(ProofreaderService);
@@ -309,12 +308,9 @@ export class AddPetComponent {
       return;
     }
     
-    // Update state within Angular's zone to ensure change detection
-    this.ngZone.run(() => {
-      this.improveDescError = null;
-      this.isImprovingDescription = true;
-      this.cdr.markForCheck();
-    });
+    this.improveDescError = null;
+    this.isImprovingDescription = true;
+    this.cdr.markForCheck();
 
     try {
       const availability = await this.writerAssist.isWriterAvailable();
@@ -345,26 +341,17 @@ export class AddPetComponent {
       const improved = await this.writerAssist.improveDescription({ current, context });
       console.log('[Writer]', improved);
       
-      // Update form and state within Angular's zone
-      this.ngZone.run(() => {
-        control?.setValue(improved);
-        control?.markAsDirty();
-        control?.markAsTouched();
-      });
+      control?.setValue(improved);
+      control?.markAsDirty();
+      control?.markAsTouched();
     } catch (err: any) {
       const message = err?.message || 'Failed to improve description. Please try again.';
-      // Update error state within Angular's zone
-      this.ngZone.run(() => {
-        this.improveDescError = message;
-        this.cdr.markForCheck();
-      });
+      this.improveDescError = message;
+      this.cdr.markForCheck();
       console.error('[Improve Description][error]', err);
     } finally {
-      // Ensure state update happens within Angular's zone for proper change detection
-      this.ngZone.run(() => {
-        this.isImprovingDescription = false;
-        this.cdr.markForCheck();
-      });
+      this.isImprovingDescription = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -375,13 +362,10 @@ export class AddPetComponent {
       return;
     }
 
-    // Update state within Angular's zone to ensure change detection
-    this.ngZone.run(() => {
-      this.proofreadError = null;
-      this.proofreadProgress = 0;
-      this.isProofreading = true;
-      this.cdr.markForCheck();
-    });
+    this.proofreadError = null;
+    this.proofreadProgress = 0;
+    this.isProofreading = true;
+    this.cdr.markForCheck();
 
     try {
       if (!this.proofreaderService.isProofreaderAvailable()) {
@@ -391,37 +375,25 @@ export class AddPetComponent {
       const corrected = await this.proofreaderService.proofreadText(
         current,
         (progress) => {
-          // Update progress within Angular's zone
-          this.ngZone.run(() => {
-            this.proofreadProgress = progress;
-            this.cdr.markForCheck();
-          });
+          this.proofreadProgress = progress;
+          this.cdr.markForCheck();
         }
       );
 
       console.log('[Proofread]', corrected);
 
-      // Update form and state within Angular's zone
-      this.ngZone.run(() => {
-        control?.setValue(corrected);
-        control?.markAsDirty();
-        control?.markAsTouched();
-      });
+      control?.setValue(corrected);
+      control?.markAsDirty();
+      control?.markAsTouched();
     } catch (err: any) {
       const message = err?.message || 'Failed to proofread description. Please try again.';
-      // Update error state within Angular's zone
-      this.ngZone.run(() => {
-        this.proofreadError = message;
-        this.cdr.markForCheck();
-      });
+      this.proofreadError = message;
+      this.cdr.markForCheck();
       console.error('[Proofread][error]', err);
     } finally {
-      // Ensure state update happens within Angular's zone for proper change detection
-      this.ngZone.run(() => {
-        this.isProofreading = false;
-        this.proofreadProgress = 0;
-        this.cdr.markForCheck();
-      });
+      this.isProofreading = false;
+      this.proofreadProgress = 0;
+      this.cdr.markForCheck();
     }
   }
 
