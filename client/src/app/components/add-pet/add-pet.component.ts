@@ -6,6 +6,7 @@ import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
 import { AiAssistService, PetImageAnalysis } from '../../services/ai-assist.service';
 import { WriterAssistService } from '../../services/writer-assist.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-add-pet',
@@ -39,6 +40,7 @@ export class AddPetComponent {
   private ngZone = inject(NgZone);
   private aiAssist = inject(AiAssistService);
   private writerAssist = inject(WriterAssistService);
+  private userService = inject(UserService);
 
   constructor() {
     this.petForm = this.fb.group({
@@ -242,6 +244,10 @@ export class AddPetComponent {
       const mm = String(today.getMonth() + 1).padStart(2, '0');
       const dd = String(today.getDate()).padStart(2, '0');
       setIfEmpty('adoptionDate', `${yyyy}-${mm}-${dd}`);
+
+      // Auto-fill location from user service if empty
+      const userLocation = this.userService.currentUser().location;
+      setIfEmpty('location', userLocation);
     } catch (err: any) {
       const message = err?.message || 'Failed to analyze image. Please try again.';
       this.aiError = message;
