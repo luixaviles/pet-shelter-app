@@ -102,3 +102,36 @@ export const createPet = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const getPetById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: 'Pet ID is required',
+      };
+      res.status(400).json(response);
+      return;
+    }
+
+    const pet = await petService.getPetById(id);
+    const response: ApiResponse<typeof pet> = {
+      success: true,
+      data: pet,
+    };
+    res.status(200).json(response);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to retrieve pet';
+    const response: ApiResponse<never> = {
+      success: false,
+      error: errorMessage,
+    };
+    // Check if it's a "not found" error
+    if (errorMessage.includes('not found')) {
+      res.status(404).json(response);
+    } else {
+      res.status(500).json(response);
+    }
+  }
+};
+

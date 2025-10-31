@@ -44,5 +44,14 @@ export class PetService {
     await this.writePets(pets);
     return newPet;
   }
+
+  async getPetById(id: string): Promise<Pet> {
+    const pets = await this.readPets();
+    const pet = pets.find(p => p.id === id);
+    if (!pet) {
+      throw new Error(`Pet with id ${id} not found`);
+    }
+    return pet;
+  }
 }
 

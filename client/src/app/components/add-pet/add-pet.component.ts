@@ -307,6 +307,7 @@ export class AddPetComponent {
   onSubmit(): void {
     if (this.petForm.valid) {
       this.isSubmitting = true;
+      this.cdr.markForCheck();
 
       const formValue = this.petForm.value;
       const ageYears = Number(formValue.ageYears) || 0;
@@ -325,12 +326,18 @@ export class AddPetComponent {
         description: formValue.description || ''
       };
 
-      this.petService.addPet(newPet);
-
-      setTimeout(() => {
-        alert(`${newPet.name} has been successfully added to the adoption list!`);
-        this.router.navigate(['/']);
-      }, 500);
+      this.petService.addPet(newPet).subscribe({
+        next: (createdPet) => {
+          alert(`${createdPet.name} has been successfully added to the adoption list!`);
+          this.router.navigate(['/']);
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          const errorMessage = error?.error?.error || error?.message || 'Failed to create pet. Please try again.';
+          alert(`Error: ${errorMessage}`);
+          this.cdr.markForCheck();
+        }
+      });
     } else {
       Object.keys(this.petForm.controls).forEach(key => {
         this.petForm.get(key)?.markAsTouched();
