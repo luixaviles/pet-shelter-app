@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject, NgZone } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -36,6 +36,7 @@ export class AddPetComponent {
   private petService = inject(PetService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
   private aiAssist = inject(AiAssistService);
   private writerAssist = inject(WriterAssistService);
 
@@ -266,9 +267,13 @@ export class AddPetComponent {
     if (!current || current.length < 10 || this.isImprovingDescription) {
       return;
     }
-    this.improveDescError = null;
-    this.isImprovingDescription = true;
-    this.cdr.markForCheck();
+    
+    // Update state within Angular's zone to ensure change detection
+    this.ngZone.run(() => {
+      this.improveDescError = null;
+      this.isImprovingDescription = true;
+      this.cdr.markForCheck();
+    });
 
     try {
       const availability = await this.writerAssist.isWriterAvailable();
@@ -298,16 +303,27 @@ export class AddPetComponent {
 
       const improved = await this.writerAssist.improveDescription({ current, context });
       console.log('[Improve Description]', improved);
-      control?.setValue(improved);
-      control?.markAsDirty();
-      control?.markAsTouched();
+      
+      // Update form and state within Angular's zone
+      this.ngZone.run(() => {
+        control?.setValue(improved);
+        control?.markAsDirty();
+        control?.markAsTouched();
+      });
     } catch (err: any) {
       const message = err?.message || 'Failed to improve description. Please try again.';
-      this.improveDescError = message;
+      // Update error state within Angular's zone
+      this.ngZone.run(() => {
+        this.improveDescError = message;
+        this.cdr.markForCheck();
+      });
       console.error('[Improve Description][error]', err);
     } finally {
-      this.isImprovingDescription = false;
-      this.cdr.markForCheck();
+      // Ensure state update happens within Angular's zone for proper change detection
+      this.ngZone.run(() => {
+        this.isImprovingDescription = false;
+        this.cdr.markForCheck();
+      });
     }
   }
 
