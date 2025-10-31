@@ -16,7 +16,7 @@ import { ToastContainerComponent } from './components/toast-container/toast-cont
             <a routerLink="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <span class="text-4xl">🐾</span>
               <div>
-                <h1 class="text-2xl font-bold text-gray-800">Pet Shelter</h1>
+                <h1 class="text-2xl font-bold text-gray-800">Pet Shelter App</h1>
                 <p class="text-sm text-gray-600">Find your perfect companion</p>
               </div>
             </a>
@@ -40,7 +40,7 @@ import { ToastContainerComponent } from './components/toast-container/toast-cont
 
       <footer class="bg-gray-800 text-white py-8 mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p class="text-lg mb-2">🐾 Pet Shelter - Bringing Families Together</p>
+          <p class="text-lg mb-2">🐾 Pet Shelter App - Bringing Families Together</p>
           <p class="text-gray-400 text-sm">
             Every pet deserves a loving home. Adopt, don't shop!
           </p>
