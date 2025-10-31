@@ -29,7 +29,7 @@ export class PetService {
     })
   );
 
-  isAdminMode = signal(false);
+  isAdminMode = signal(true);
 
   constructor(private http: HttpClient) {
     this.loadPets();

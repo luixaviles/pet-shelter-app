@@ -2,10 +2,11 @@ import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { PetService } from './services/pet.service';
+import { UserWidgetComponent } from './components/user-widget/user-widget.component';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, RouterLink],
+  imports: [CommonModule, RouterOutlet, RouterLink, UserWidgetComponent],
   template: `
     <div class="min-h-screen">
       <nav class="bg-white shadow-md sticky top-0 z-50">
@@ -20,29 +21,13 @@ import { PetService } from './services/pet.service';
             </a>
 
             <div class="flex items-center gap-4">
-              <label class="flex items-center cursor-pointer group">
-                <span class="mr-3 text-sm font-semibold text-gray-700 group-hover:text-primary-600 transition-colors">
-                  Admin Mode
-                </span>
-                <div class="relative">
-                  <input
-                    type="checkbox"
-                    [checked]="petService.isAdminMode()"
-                    (change)="petService.toggleAdminMode()"
-                    class="sr-only peer"
-                  />
-                  <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary-600"></div>
-                </div>
-              </label>
-
-              @if (petService.isAdminMode()) {
-                <a
-                  routerLink="/add-pet"
-                  class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md animate-scale-in"
-                >
-                  + Add New Pet
-                </a>
-              }
+              <app-user-widget></app-user-widget>
+              <a
+                routerLink="/add-pet"
+                class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md animate-scale-in"
+              >
+                + Add New Pet
+              </a>
             </div>
           </div>
         </div>
