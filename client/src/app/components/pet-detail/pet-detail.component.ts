@@ -6,10 +6,11 @@ import { Observable, switchMap, tap } from 'rxjs';
 import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
 import { TranslatorService } from '../../services/translator.service';
+import { AgeFormatPipe } from '../../pipes/age-format.pipe';
 
 @Component({
   selector: 'app-pet-detail',
-  imports: [CommonModule, RouterLink, NgOptimizedImage, FormsModule],
+  imports: [CommonModule, RouterLink, NgOptimizedImage, FormsModule, AgeFormatPipe],
   templateUrl: './pet-detail.component.html',
   styleUrls: ['./pet-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

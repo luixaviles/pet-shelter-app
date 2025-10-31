@@ -36,7 +36,7 @@
       </div>
       <div class="flex items-center">
         <span class="font-semibold mr-2">Age:</span>
-        <span>{{ pet().age }} {{ pet().age === 1 ? 'year' : 'years' }}</span>
+        <span>{{ pet().age | ageFormat }}</span>
       </div>
       <div class="flex items-center">
         <span class="font-semibold mr-2">Location:</span>
@@ -44,7 +44,7 @@
       </div>
       <div class="flex items-center">
         <span class="font-semibold mr-2">Available:</span>
-        <span>{{ pet().adoptionDate }}</span>
+        <span>{{ pet().adoptionDate | date: 'MMM d, y' }}</span>
       </div>
     </div>
 

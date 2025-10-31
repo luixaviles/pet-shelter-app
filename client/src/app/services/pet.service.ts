@@ -1,7 +1,9 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, combineLatest, map } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, BehaviorSubject, combineLatest, map, catchError, of } from 'rxjs';
 import { Pet, AnimalTypeFilter, GenderFilter } from '../models/pet.model';
+import { ApiResponse } from '../models/api-response.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -34,15 +36,37 @@ export class PetService {
   }
 
   private loadPets(): void {
-    this.http.get<Pet[]>('/assets/pets.json').subscribe({
-      next: (pets) => this.petsSubject.next(pets),
-      error: (error) => console.error('Error loading pets:', error)
+    this.http.get<ApiResponse<Pet[]>>(`${environment.apiUrl}/pets`).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.petsSubject.next(response.data);
+        } else {
+          console.error('Error loading pets:', response.error);
+          this.petsSubject.next([]);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading pets:', error);
+        this.petsSubject.next([]);
+      }
     });
   }
 
   getPetById(id: string): Observable<Pet | undefined> {
-    return this.pets$.pipe(
-      map(pets => pets.find(pet => pet.id === id))
+    return this.http.get<ApiResponse<Pet>>(`${environment.apiUrl}/pets/${id}`).pipe(
+      map(response => {
+        if (response.success && response.data) {
+          return response.data;
+        }
+        return undefined;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 404) {
+          return of(undefined);
+        }
+        console.error('Error loading pet:', error);
+        return of(undefined);
+      })
     );
   }
 
@@ -54,13 +78,22 @@ export class PetService {
     this.genderFilterSubject.next(filter);
   }
 
-  addPet(pet: Pet): void {
-    const currentPets = this.petsSubject.value;
-    const newPet = {
-      ...pet,
-      id: (Math.max(...currentPets.map(p => parseInt(p.id))) + 1).toString()
-    };
-    this.petsSubject.next([...currentPets, newPet]);
+  addPet(formData: FormData): Observable<Pet> {
+    return this.http.post<ApiResponse<Pet>>(`${environment.apiUrl}/pets`, formData).pipe(
+      map(response => {
+        if (response.success && response.data) {
+          // Update local state with the new pet from server
+          const currentPets = this.petsSubject.value;
+          this.petsSubject.next([...currentPets, response.data!]);
+          return response.data;
+        }
+        throw new Error(response.error || 'Failed to create pet');
+      }),
+      catchError(error => {
+        console.error('Error creating pet:', error);
+        throw error;
+      })
+    );
   }
 
   toggleAdminMode(): void {

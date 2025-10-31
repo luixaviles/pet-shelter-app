@@ -1,6 +1,6 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject, NgZone } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PetService } from '../../services/pet.service';
 import { Pet } from '../../models/pet.model';
@@ -17,6 +17,7 @@ import { WriterAssistService } from '../../services/writer-assist.service';
 export class AddPetComponent {
   petForm: FormGroup;
   imagePreview: string = '';
+  selectedImageFile: File | null = null;
   isSubmitting: boolean = false;
   isDragOver: boolean = false;
   imageError: string | null = null;
@@ -35,6 +36,7 @@ export class AddPetComponent {
   private petService = inject(PetService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
   private aiAssist = inject(AiAssistService);
   private writerAssist = inject(WriterAssistService);
 
@@ -44,13 +46,29 @@ export class AddPetComponent {
       animalType: ['', Validators.required],
       breed: ['', Validators.required],
       gender: ['', Validators.required],
-      age: ['', [Validators.required, Validators.min(0)]],
+      ageYears: ['', [Validators.required, Validators.min(0)]],
+      ageMonths: ['', [Validators.required, Validators.min(0), Validators.max(11)]],
       location: ['', Validators.required],
       adoptionDate: ['', Validators.required],
-      imageUrl: ['', [Validators.required]],
+      imageUrl: [''], // Keep for preview purposes, not for validation
       description: ['']
-    });
+    }, { validators: this.ageValidator });
   }
+
+  private ageValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    const years = control.get('ageYears')?.value;
+    const months = control.get('ageMonths')?.value;
+    if ((years === null || years === undefined || years === '') && 
+        (months === null || months === undefined || months === '')) {
+      return null; // Let required validators handle empty values
+    }
+    const yearsNum = Number(years);
+    const monthsNum = Number(months);
+    if ((yearsNum === 0 || isNaN(yearsNum)) && (monthsNum === 0 || isNaN(monthsNum))) {
+      return { ageRequired: true };
+    }
+    return null;
+  };
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -96,6 +114,9 @@ export class AddPetComponent {
       return;
     }
     
+    // Store the File object for FormData submission
+    this.selectedImageFile = file;
+    
     // Reset form fields when a new valid image is loaded (except imageUrl which will be set below)
     // Only reset if there was a previous image, to avoid clearing manually entered data on first load
     if (this.imagePreview) {
@@ -112,6 +133,7 @@ export class AddPetComponent {
       })
       .catch(() => {
         this.imageError = 'Failed to load image. Please try a different file.';
+        this.selectedImageFile = null;
         this.cdr.markForCheck();
       });
   }
@@ -127,7 +149,8 @@ export class AddPetComponent {
       animalType: '',
       breed: '',
       gender: '',
-      age: '',
+      ageYears: '',
+      ageMonths: '',
       location: '',
       adoptionDate: '',
       description: ''
@@ -137,6 +160,7 @@ export class AddPetComponent {
     this.aiSummary = null;
     this.aiError = null;
     this.lastAiResult = null;
+    // Note: selectedImageFile is not reset here as it's set when a new file is selected
   }
 
   private loadFileAsDataUrl(file: File): Promise<string> {
@@ -150,6 +174,7 @@ export class AddPetComponent {
 
   removeImage(): void {
     this.imagePreview = '';
+    this.selectedImageFile = null;
     this.petForm.get('imageUrl')?.setValue('');
     this.petForm.get('imageUrl')?.markAsDirty();
     this.petForm.get('imageUrl')?.markAsTouched();
@@ -203,8 +228,9 @@ export class AddPetComponent {
           setIfEmpty('gender', normalizedGender);
         }
       }
-      if (typeof result.age === 'number' && result.age >= 0) {
-        setIfEmpty('age', Math.round(result.age));
+      if (typeof result.age === 'object') { 
+        setIfEmpty('ageYears', result.age?.years ?? 0);
+        setIfEmpty('ageMonths', result.age?.months ?? 0);
       }
       if (result.name) {
         setIfEmpty('name', result.name);
@@ -241,9 +267,13 @@ export class AddPetComponent {
     if (!current || current.length < 10 || this.isImprovingDescription) {
       return;
     }
-    this.improveDescError = null;
-    this.isImprovingDescription = true;
-    this.cdr.markForCheck();
+    
+    // Update state within Angular's zone to ensure change detection
+    this.ngZone.run(() => {
+      this.improveDescError = null;
+      this.isImprovingDescription = true;
+      this.cdr.markForCheck();
+    });
 
     try {
       const availability = await this.writerAssist.isWriterAvailable();
@@ -257,39 +287,86 @@ export class AddPetComponent {
       if (formVals.animalType) contextParts.push(`Animal: ${formVals.animalType}`);
       if (formVals.breed) contextParts.push(`Breed: ${formVals.breed}`);
       if (formVals.gender) contextParts.push(`Gender: ${formVals.gender}`);
-      if (formVals.age !== undefined && formVals.age !== null && String(formVals.age) !== '') contextParts.push(`Age: ${formVals.age}`);
+      const ageYears = formVals.ageYears !== undefined && formVals.ageYears !== null && String(formVals.ageYears) !== '' ? Number(formVals.ageYears) : 0;
+      const ageMonths = formVals.ageMonths !== undefined && formVals.ageMonths !== null && String(formVals.ageMonths) !== '' ? Number(formVals.ageMonths) : 0;
+      if (ageYears > 0 || ageMonths > 0) {
+        const ageParts: string[] = [];
+        if (ageYears > 0) {
+          ageParts.push(`${ageYears} ${ageYears === 1 ? 'year' : 'years'}`);
+        }
+        if (ageMonths > 0) {
+          ageParts.push(`${ageMonths} ${ageMonths === 1 ? 'month' : 'months'}`);
+        }
+        contextParts.push(`Age: ${ageParts.join(' ')}`);
+      }
       const context = contextParts.join('\n');
 
       const improved = await this.writerAssist.improveDescription({ current, context });
       console.log('[Improve Description]', improved);
-      control?.setValue(improved);
-      control?.markAsDirty();
-      control?.markAsTouched();
+      
+      // Update form and state within Angular's zone
+      this.ngZone.run(() => {
+        control?.setValue(improved);
+        control?.markAsDirty();
+        control?.markAsTouched();
+      });
     } catch (err: any) {
       const message = err?.message || 'Failed to improve description. Please try again.';
-      this.improveDescError = message;
+      // Update error state within Angular's zone
+      this.ngZone.run(() => {
+        this.improveDescError = message;
+        this.cdr.markForCheck();
+      });
       console.error('[Improve Description][error]', err);
     } finally {
-      this.isImprovingDescription = false;
-      this.cdr.markForCheck();
+      // Ensure state update happens within Angular's zone for proper change detection
+      this.ngZone.run(() => {
+        this.isImprovingDescription = false;
+        this.cdr.markForCheck();
+      });
     }
   }
 
   onSubmit(): void {
+    // Validate that an image file is selected
+    if (!this.selectedImageFile) {
+      this.imageError = 'Please select an image file.';
+      this.cdr.markForCheck();
+      return;
+    }
+
     if (this.petForm.valid) {
       this.isSubmitting = true;
+      this.cdr.markForCheck();
 
-      const newPet: Pet = {
-        id: '',
-        ...this.petForm.value
-      };
+      const formValue = this.petForm.value;
+      const ageYears = Number(formValue.ageYears) || 0;
+      const ageMonths = Number(formValue.ageMonths) || 0;
 
-      this.petService.addPet(newPet);
+      // Create FormData for multipart/form-data request
+      const formData = new FormData();
+      formData.append('image', this.selectedImageFile);
+      formData.append('name', formValue.name);
+      formData.append('animalType', formValue.animalType);
+      formData.append('breed', formValue.breed);
+      formData.append('gender', formValue.gender);
+      formData.append('age', JSON.stringify({ years: ageYears, months: ageMonths }));
+      formData.append('location', formValue.location);
+      formData.append('adoptionDate', formValue.adoptionDate);
+      formData.append('description', formValue.description || '');
 
-      setTimeout(() => {
-        alert(`${newPet.name} has been successfully added to the adoption list!`);
-        this.router.navigate(['/']);
-      }, 500);
+      this.petService.addPet(formData).subscribe({
+        next: (createdPet) => {
+          alert(`${createdPet.name} has been successfully added to the adoption list!`);
+          this.router.navigate(['/']);
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          const errorMessage = error?.error?.error || error?.message || 'Failed to create pet. Please try again.';
+          alert(`Error: ${errorMessage}`);
+          this.cdr.markForCheck();
+        }
+      });
     } else {
       Object.keys(this.petForm.controls).forEach(key => {
         this.petForm.get(key)?.markAsTouched();

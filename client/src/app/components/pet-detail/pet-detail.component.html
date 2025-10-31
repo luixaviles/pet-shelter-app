@@ -60,7 +60,7 @@
 
                 <div class="flex items-center border-b border-gray-200 pb-3">
                   <span class="font-semibold text-gray-700 w-32">Age:</span>
-                  <span class="text-gray-600">{{ pet.age }} {{ pet.age === 1 ? 'year' : 'years' }} old</span>
+                  <span class="text-gray-600">{{ pet.age | ageFormat }}</span>
                 </div>
 
                 <div class="flex items-center border-b border-gray-200 pb-3">
@@ -70,7 +70,7 @@
 
                 <div class="flex items-center border-b border-gray-200 pb-3">
                   <span class="font-semibold text-gray-700 w-32">Available From:</span>
-                  <span class="text-gray-600">{{ pet.adoptionDate }}</span>
+                  <span class="text-gray-600">{{ pet.adoptionDate | date: 'MMM d, y' }}</span>
                 </div>
               </div>
 

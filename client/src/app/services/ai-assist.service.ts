@@ -4,7 +4,7 @@ export type PetImageAnalysis = {
   animal: 'cat' | 'dog' | 'unknown';
   breed: string;
   gender?: string;
-  age?: number;
+  age?: { years: number; months: number };
   name?: string;
   description?: string;
   confidence?: number;
@@ -39,8 +39,8 @@ export class AiAssistService {
     const imageEl = await loadImageFromDataUrl(dataUrl);
 
     const prompt = `You are a precise image classifier. 
-    Identify if the image shows a cat or a dog and infer the likely breed, gender, and age(in years), providing a description of the pet and a suggested name. The description must be based on the pet in the image(omit age and breed for the description).
-    Respond ONLY with minified JSON with keys: animal ('cat'|'dog'|'unknown'), breed (string), gender (string), age (number), name (string), confidence (0..1), description (string). No extra text.`;
+    Identify if the image shows a cat or a dog and infer the likely breed, gender, and age(in years and months), providing a description of the pet and a suggested name. The description must be based on the pet in the image(omit age and breed for the description).
+    Respond ONLY with minified JSON with keys: animal ('cat'|'dog'|'unknown'), breed (string), gender (string), age (object with keys: years, months), name (string), confidence (0..1), description (string). No extra text.`;
 
     const LanguageModel: any = (globalThis as any).LanguageModel;
     const session = await LanguageModel.create({ expectedInputs: [{ type: 'image' }] });
@@ -83,7 +83,7 @@ export class AiAssistService {
           : 'unknown',
       breed: typeof parsed?.breed === 'string' ? parsed.breed : '',
       gender: typeof parsed?.gender === 'string' ? parsed.gender : undefined,
-      age: typeof parsed?.age === 'number' && parsed.age >= 0 ? parsed.age : undefined,
+      age: typeof parsed?.age === 'object' && parsed.age?.years >= 0 && parsed.age?.months >= 0 ? parsed.age : undefined,
       name: typeof parsed?.name === 'string' ? parsed.name : undefined,
       description: typeof parsed?.description === 'string' ? parsed.description : undefined,
       confidence:

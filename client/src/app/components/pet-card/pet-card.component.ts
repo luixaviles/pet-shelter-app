@@ -2,10 +2,11 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Pet } from '../../models/pet.model';
+import { AgeFormatPipe } from '../../pipes/age-format.pipe';
 
 @Component({
   selector: 'app-pet-card',
-  imports: [CommonModule, RouterLink, NgOptimizedImage],
+  imports: [CommonModule, RouterLink, NgOptimizedImage, AgeFormatPipe],
   templateUrl: './pet-card.component.html',
   styleUrls: ['./pet-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
