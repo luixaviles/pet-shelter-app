@@ -32,6 +32,17 @@ export const errorHandler = (
     }
   }
 
+  // Handle multer errors (file upload errors)
+  if (err.name === 'MulterError' || 'code' in err) {
+    if ('code' in err && err.code === 'LIMIT_FILE_SIZE') {
+      statusCode = 400;
+      errorMessage = 'File too large. Maximum file size is 5MB';
+    } else if (err.message.includes('Only image files')) {
+      statusCode = 400;
+      errorMessage = err.message;
+    }
+  }
+
   // Use custom error message if available
   if (err.message) {
     errorMessage = err.message;

@@ -9,12 +9,21 @@
     "build": "tsc",
     "lint": "eslint . --ext .ts"
   },
-  "keywords": ["pet-shelter", "api", "express", "typescript"],
+  "keywords": [
+    "pet-shelter",
+    "api",
+    "express",
+    "typescript"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/multer": "^2.0.0",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "firebase-admin": "^13.5.0",
+    "multer": "^2.0.2",
+    "nanoid": "^5.1.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -27,4 +36,3 @@
     "typescript": "^5.3.3"
   }
 }
-
