@@ -428,7 +428,7 @@ export class AddPetComponent {
       this.petService.addPet(formData).subscribe({
         next: (createdPet) => {
           this.toastService.success(`${createdPet.name} has been successfully added to the adoption list!`);
-          this.router.navigate(['/']);
+          this.router.navigate(['/pet/list']);
         },
         error: (error) => {
           this.isSubmitting = false;
