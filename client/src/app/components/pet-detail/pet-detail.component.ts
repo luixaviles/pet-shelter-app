@@ -37,7 +37,7 @@ export class PetDetailComponent implements OnInit {
       switchMap(params => {
         const id = params.get('id');
         if (!id) {
-          this.router.navigate(['/']);
+          this.router.navigate(['/pet/list']);
           return [];
         }
         return this.petService.getPetById(id);

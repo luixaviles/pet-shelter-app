@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build"
+    "build": "ng build",
+    "deploy:prod": "ng build --configuration production && firebase deploy"
   },
   "dependencies": {
     "@angular/animations": "^20.0.0",
