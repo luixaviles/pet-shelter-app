@@ -18,7 +18,7 @@ import { ToastService } from '../../services/toast.service';
 })
 export class PetDetailComponent implements OnInit {
   pet$!: Observable<Pet | undefined>;
-  selectedLanguage: 'en' | 'es' | 'fr' = 'en';
+  selectedLanguage: 'en' | 'es' | 'fr' | 'ja' = 'en';
   translatedDescription: string | null = null;
   isTranslating: boolean = false;
   translationProgress: number = 0;
