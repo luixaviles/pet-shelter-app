@@ -1,0 +1,376 @@
+<!-- Header & Navigation -->
+<header class="sticky top-0 z-50 w-full bg-white/90 shadow-sm backdrop-blur-md">
+  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo/Title -->
+      <a routerLink="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <span class="text-4xl">🐾</span>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">Pet Shelter App</h1>
+          <p class="text-sm text-gray-600">Find your perfect companion</p>
+        </div>
+      </a>
+      <!-- Navigation Links -->
+      <div class="hidden sm:block sm:ml-6">
+        <div class="flex space-x-4">
+          <a
+            (click)="$event.preventDefault(); scrollToSection('#problem')"
+            class="text-stone-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+          >
+            The Problem
+          </a>
+          <a
+            (click)="$event.preventDefault(); scrollToSection('#solution')"
+            class="text-stone-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+          >
+            Our Solution
+          </a>
+          <a
+            (click)="$event.preventDefault(); scrollToSection('#mission')"
+            class="text-stone-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+          >
+            Our Mission
+          </a>
+          <a
+            (click)="$event.preventDefault(); scrollToSection('#contact')"
+            class="text-stone-600 hover:text-primary-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+          >
+            Contact
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- Main Content -->
+<main>
+  <!-- Section 1: Hero (Slide 1) -->
+  <section id="home" class="bg-white animate-fade-in">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
+      <h1 class="text-4xl md:text-6xl font-bold text-primary-800 leading-tight">
+        Pet Shelter App
+      </h1>
+      <p class="mt-6 text-xl md:text-2xl text-stone-700 max-w-3xl mx-auto">
+        A powerful, private, and free AI co-pilot for animal shelters, built with Google Chrome's built-in AI.
+      </p>
+      <a
+        routerLink="/pet/list"
+        class="mt-10 inline-block bg-primary-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-primary-700 transition-all text-lg cursor-pointer"
+      >
+        Try It Now
+      </a>
+    </div>
+  </section>
+
+  <!-- Section 2: The Problem (Slide 2 & 3) -->
+  <section id="problem" class="py-20 md:py-28 animate-fade-in" style="animation-delay: 0.1s;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-stone-800">The Shelter's Dilemma</h2>
+        <p class="mt-4 text-lg text-stone-600 max-w-2xl mx-auto">
+          Shelters are the frontline of animal rescue, but they face two critical barriers that limit their impact.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-start">
+        <!-- The Dilemma (Slide 2) -->
+        <div class="bg-white p-8 rounded-lg shadow-lg animate-slide-up" style="animation-delay: 0.2s;">
+          <h3 class="text-2xl font-semibold text-primary-700 mb-4">1. The Resource Barrier</h3>
+          <p class="text-stone-600 mb-4">
+            Shelters and non-profits are overwhelmed and under-resourced. Their current process for creating pet profiles is slow and manual.
+          </p>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <span class="flex-shrink-0 w-6 h-6 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mr-3 font-bold">!</span>
+              <span><strong>Overwhelmed Staff:</strong> Every minute spent on data entry is a minute not spent on animal care.</span>
+            </li>
+            <li class="flex items-start">
+              <span class="flex-shrink-0 w-6 h-6 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mr-3 font-bold">!</span>
+              <span><strong>Low Engagement:</strong> Manual, hasty posts struggle to reach a wide audience or capture an adopter's heart.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- The "Cloud" Barrier (Slide 3) -->
+        <div class="bg-white p-8 rounded-lg shadow-lg animate-slide-up" style="animation-delay: 0.3s;">
+          <h3 class="text-2xl font-semibold text-primary-700 mb-4">2. The "Cloud AI" Barrier</h3>
+          <p class="text-stone-600 mb-4">
+            Powerful generative AI seems like the obvious solution, but for a non-profit, it has been a luxury they can't afford.
+          </p>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <span class="flex-shrink-0 w-6 h-6 bg-red-100 text-red-700 rounded-full flex items-center justify-center mr-3 font-bold">$</span>
+              <span><strong>Too Expensive:</strong> Server costs and per-API-call fees for every pet profile are unsustainable for a donation-funded shelter.</span>
+            </li>
+            <li class="flex items-start">
+              <span class="flex-shrink-0 w-6 h-6 bg-red-100 text-red-700 rounded-full flex items-center justify-center mr-3 font-bold">?</span>
+              <span><strong>Too Complex:</strong> Requires technical hurdles and raises valid data privacy concerns for shelter operations.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="text-center mt-12 text-xl font-semibold text-stone-700">
+        Shelters have been locked out of the AI revolution. Until now.
+      </p>
+    </div>
+  </section>
+
+  <!-- Section 3: Our Solution (Slide 4 & 5) -->
+  <section id="solution" class="py-20 md:py-28 bg-white animate-fade-in" style="animation-delay: 0.2s;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-stone-800">Our Solution: AI for *Everyone*</h2>
+        <p class="mt-4 text-lg text-stone-600 max-w-3xl mx-auto">
+          We use Chrome's built-in AI to give shelters a 'superpower.' All features run instantly, privately, and for free, directly on-device. Explore the features below to see how it works.
+        </p>
+      </div>
+
+      <!-- Interactive Tabs -->
+      <div class="mb-8 flex flex-wrap justify-center gap-2 md:gap-4">
+        <button
+          (click)="switchTab('prompt')"
+          [class.tab-active]="activeTab() === 'prompt'"
+          class="solution-tab px-5 py-2 rounded-md font-medium border-2 transition-all"
+          [class.text-stone-600]="activeTab() !== 'prompt'"
+          [class.hover:bg-stone-100]="activeTab() !== 'prompt'"
+          [class.border-transparent]="activeTab() !== 'prompt'"
+        >
+          Prompt API
+        </button>
+        <button
+          (click)="switchTab('writer')"
+          [class.tab-active]="activeTab() === 'writer'"
+          class="solution-tab px-5 py-2 rounded-md font-medium border-2 transition-all"
+          [class.text-stone-600]="activeTab() !== 'writer'"
+          [class.hover:bg-stone-100]="activeTab() !== 'writer'"
+          [class.border-transparent]="activeTab() !== 'writer'"
+        >
+          Writer API
+        </button>
+        <button
+          (click)="switchTab('proofreader')"
+          [class.tab-active]="activeTab() === 'proofreader'"
+          class="solution-tab px-5 py-2 rounded-md font-medium border-2 transition-all"
+          [class.text-stone-600]="activeTab() !== 'proofreader'"
+          [class.hover:bg-stone-100]="activeTab() !== 'proofreader'"
+          [class.border-transparent]="activeTab() !== 'proofreader'"
+        >
+          Proofreader API
+        </button>
+        <button
+          (click)="switchTab('translator')"
+          [class.tab-active]="activeTab() === 'translator'"
+          class="solution-tab px-5 py-2 rounded-md font-medium border-2 transition-all"
+          [class.text-stone-600]="activeTab() !== 'translator'"
+          [class.hover:bg-stone-100]="activeTab() !== 'translator'"
+          [class.border-transparent]="activeTab() !== 'translator'"
+        >
+          Translator API
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="bg-stone-50 border border-stone-200 p-6 md:p-10 rounded-lg shadow-inner min-h-[400px]">
+        <!-- Prompt API Content -->
+        <div [class.hidden]="activeTab() !== 'prompt'" class="solution-content space-y-6">
+          <h3 class="text-2xl font-semibold text-primary-700">1. Prompt API: Instant Pet Profiles</h3>
+          <p class="text-stone-600 text-lg">Volunteers just drag in a photo. The on-device Prompt API analyzes the image to instantly and privately auto-fill the intake form.</p>
+          <div class="grid md:grid-cols-2 gap-6 mt-6">
+            <div class="rounded-lg border bg-white p-6">
+              <h4 class="text-lg font-semibold mb-3">BEFORE: Manual Entry</h4>
+              <div class="w-full h-48 bg-stone-200 rounded-md flex items-center justify-center text-stone-500">
+                <span>Drag & Drop Pet Photo Here</span>
+              </div>
+              <form class="mt-4 space-y-2">
+                <div>
+                  <label class="text-sm font-medium">Name:</label>
+                  <input type="text" placeholder="Type name..." class="w-full border-stone-300 rounded-md p-2">
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Breed:</label>
+                  <input type="text" placeholder="Type breed..." class="w-full border-stone-300 rounded-md p-2">
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Age:</label>
+                  <input type="text" placeholder="Guess age..." class="w-full border-stone-300 rounded-md p-2">
+                </div>
+              </form>
+            </div>
+            <div class="rounded-lg border bg-white p-6 border-primary-200 shadow-lg animate-scale-in">
+              <h4 class="text-lg font-semibold mb-3 text-primary-700">AFTER: AI Auto-Filled</h4>
+              <div class="w-full h-48 bg-stone-200 rounded-md flex items-center justify-center text-stone-500">
+                <span>photo_of_dog.jpg</span>
+              </div>
+              <form class="mt-4 space-y-2">
+                <div>
+                  <label class="text-sm font-medium">Name:</label>
+                  <input type="text" value="Buddy (Suggested)" class="w-full border-stone-300 rounded-md p-2 bg-primary-50 font-medium" disabled>
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Breed:</label>
+                  <input type="text" value="Golden Retriever Mix" class="w-full border-stone-300 rounded-md p-2 bg-primary-50 font-medium" disabled>
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Age:</label>
+                  <input type="text" value="Approx. 2 years" class="w-full border-stone-300 rounded-md p-2 bg-primary-50 font-medium" disabled>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Writer API Content -->
+        <div [class.hidden]="activeTab() !== 'writer'" class="solution-content space-y-6">
+          <h3 class="text-2xl font-semibold text-primary-700">2. Writer API: Engaging Pet Stories</h3>
+          <p class="text-stone-600 text-lg">A volunteer types a few simple notes. The on-device Writer API expands them into a warm, engaging story to capture an adopter's heart.</p>
+          <div class="grid md:grid-cols-2 gap-6 mt-6">
+            <div class="rounded-lg border bg-white p-6">
+              <h4 class="text-lg font-semibold mb-3">BEFORE: Simple Notes</h4>
+              <textarea class="w-full h-48 border-stone-300 rounded-md p-3 text-stone-800" disabled>friendly, loves sun, good with kids, needs yard</textarea>
+            </div>
+            <div class="rounded-lg border bg-white p-6 border-primary-200 shadow-lg animate-scale-in">
+              <h4 class="text-lg font-semibold mb-3 text-primary-700">AFTER: AI-Generated Story</h4>
+              <textarea class="w-full h-48 border-stone-300 rounded-md p-3 text-stone-800 bg-primary-50" disabled>Meet Buddy! This friendly soul is a true ray of sunshine who absolutely adores soaking up the sun in a cozy spot. He's fantastic with kids and would thrive in a home with a yard to call his own. Are you ready to meet your new best friend?</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proofreader API Content -->
+        <div [class.hidden]="activeTab() !== 'proofreader'" class="solution-content space-y-6">
+          <h3 class="text-2xl font-semibold text-primary-700">3. Proofreader API: Professional Posts</h3>
+          <p class="text-stone-600 text-lg">In a rush, volunteers can make typos. The Proofreader API instantly cleans up errors, ensuring every post is professional and clear.</p>
+          <div class="grid md:grid-cols-2 gap-6 mt-6">
+            <div class="rounded-lg border bg-white p-6">
+              <h4 class="text-lg font-semibold mb-3">BEFORE: Hasty Draft</h4>
+              <p class="w-full h-48 border border-stone-300 rounded-md p-3 text-stone-800">
+                This is Sady, shes <span class="text-red-600 line-through">aweome</span> and <span class="text-red-600 line-through">super freindly</span>. She <span class="text-red-600 line-through">luv</span> kids and other dogs. <span class="text-red-600 line-through">pleese</span> adopt her.
+              </p>
+            </div>
+            <div class="rounded-lg border bg-white p-6 border-primary-200 shadow-lg animate-scale-in">
+              <h4 class="text-lg font-semibold mb-3 text-primary-700">AFTER: AI-Proofread</h4>
+              <p class="w-full h-48 border border-stone-300 rounded-md p-3 text-stone-800 bg-primary-50">
+                This is Sadie, she's <span class="text-green-700 font-medium">awesome</span> and <span class="text-green-700 font-medium">super friendly</span>. She <span class="text-green-700 font-medium">loves</span> kids and other dogs. <span class="text-green-700 font-medium">Please</span> adopt her.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Translator API Content -->
+        <div [class.hidden]="activeTab() !== 'translator'" class="solution-content space-y-6">
+          <h3 class="text-2xl font-semibold text-primary-700">4. Translator API: Breaking Barriers</h3>
+          <p class="text-stone-600 text-lg">The on-device Translator API makes pet profiles accessible to more adopters by instantly translating the story, breaking down language barriers.</p>
+          <div class="max-w-2xl mx-auto mt-6">
+            <div class="rounded-lg border bg-white p-6 shadow-lg animate-scale-in">
+              <h4 class="text-lg font-semibold mb-4 text-center">Final Pet Profile</h4>
+
+              <div class="flex justify-center gap-3 mb-4">
+                <button
+                  (click)="switchLanguage('en')"
+                  [class.tab-active]="activeLang() === 'en'"
+                  class="lang-btn px-4 py-1 rounded-md font-medium text-sm border-2 transition-all"
+                  [class.text-stone-600]="activeLang() !== 'en'"
+                  [class.hover:bg-stone-100]="activeLang() !== 'en'"
+                  [class.border-transparent]="activeLang() !== 'en'"
+                >
+                  English
+                </button>
+                <button
+                  (click)="switchLanguage('es')"
+                  [class.tab-active]="activeLang() === 'es'"
+                  class="lang-btn px-4 py-1 rounded-md font-medium text-sm border-2 transition-all"
+                  [class.text-stone-600]="activeLang() !== 'es'"
+                  [class.hover:bg-stone-100]="activeLang() !== 'es'"
+                  [class.border-transparent]="activeLang() !== 'es'"
+                >
+                  Español
+                </button>
+                <button
+                  (click)="switchLanguage('fr')"
+                  [class.tab-active]="activeLang() === 'fr'"
+                  class="lang-btn px-4 py-1 rounded-md font-medium text-sm border-2 transition-all"
+                  [class.text-stone-600]="activeLang() !== 'fr'"
+                  [class.hover:bg-stone-100]="activeLang() !== 'fr'"
+                  [class.border-transparent]="activeLang() !== 'fr'"
+                >
+                  Français
+                </button>
+              </div>
+
+              <div class="w-full h-40 border border-stone-200 bg-stone-50 rounded-md p-4">
+                @if (activeLang() === 'en') {
+                  <p class="lang-text">
+                    Meet Buddy! This friendly soul is a true ray of sunshine who absolutely adores soaking up the sun. He's fantastic with kids and would thrive in a home with a yard to call his own.
+                  </p>
+                }
+                @if (activeLang() === 'es') {
+                  <p class="lang-text">
+                    ¡Conoce a Buddy! Esta alma amigable es un verdadero rayo de sol que adora tomar el sol. Es fantástico con los niños y prosperaría en un hogar con un patio propio.
+                  </p>
+                }
+                @if (activeLang() === 'fr') {
+                  <p class="lang-text">
+                    Rencontrez Buddy ! Cette âme amicale est un vrai rayon de soleil qui adore profiter du soleil. Il est fantastique avec les enfants et s'épanouirait dans une maison avec un jardin bien à lui.
+                  </p>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- The Result (Slide 5) -->
+      <div class="mt-16 text-center">
+        <h3 class="text-2xl font-semibold text-stone-800 mb-8">The Result: A Tool That's Truly Accessible</h3>
+        <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div class="bg-primary-50 border border-primary-200 p-6 rounded-lg animate-slide-up" style="animation-delay: 0.3s;">
+            <span class="text-3xl">🖥️</span>
+            <h4 class="text-xl font-semibold text-primary-800 mt-2">No Server Costs</h4>
+            <p class="text-primary-700 mt-1">All AI runs on-device. No cloud infrastructure to maintain.</p>
+          </div>
+          <div class="bg-primary-50 border border-primary-200 p-6 rounded-lg animate-slide-up" style="animation-delay: 0.4s;">
+            <span class="text-3xl">💸</span>
+            <h4 class="text-xl font-semibold text-primary-800 mt-2">No API Fees</h4>
+            <p class="text-primary-700 mt-1">Shelters can create unlimited profiles with zero processing fees.</p>
+          </div>
+          <div class="bg-primary-50 border border-primary-200 p-6 rounded-lg animate-slide-up" style="animation-delay: 0.5s;">
+            <span class="text-3xl">🔒</span>
+            <h4 class="text-xl font-semibold text-primary-800 mt-2">Total Privacy</h4>
+            <p class="text-primary-700 mt-1">No shelter or pet data ever leaves the user's computer.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: The Mission (Slide 5) -->
+  <section id="mission" class="py-20 md:py-28 bg-primary-700 text-white animate-fade-in" style="animation-delay: 0.3s;">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold">Our Mission: AI for Equity</h2>
+      <p class="mt-6 text-xl md:text-2xl text-primary-100">
+        This isn't just a tech demo; it's a new model for accessibility.
+      </p>
+      <p class="mt-6 text-lg text-primary-50">
+        By building on the Chrome AI APIs, we've created a tool that is truly equitable. We're giving powerful, private, enterprise-grade AI to the organizations that need it most—our local, under-resourced non-profits—at a cost they can finally afford: <strong>zero</strong>.
+      </p>
+    </div>
+  </section>
+
+  <!-- Section 5: Thank You (Slide 6) -->
+  <section id="contact" class="py-20 md:py-28 bg-white animate-fade-in" style="animation-delay: 0.4s;">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-stone-800">Thank You</h2>
+      <p class="mt-6 text-2xl md:text-3xl font-semibold text-primary-700">
+        "Helping shelters save time, so they can save more lives."
+      </p>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-stone-800 text-stone-400 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
+    &copy; 2025 Pet Shelter App. 
+  </div>
+</footer>
