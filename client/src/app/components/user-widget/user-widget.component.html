@@ -1,10 +1,30 @@
-<div class="flex items-center gap-3">
-  <div class="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-semibold text-lg">
-    {{ currentUser().name.charAt(0).toUpperCase() }}
-  </div>
-  <div class="flex flex-col">
+<div class="relative flex items-center gap-2 sm:gap-3">
+  <button
+    (click)="toggleMobileMenu()"
+    class="sm:pointer-events-none sm:cursor-default"
+    aria-label="Toggle user menu"
+    [attr.aria-expanded]="isMobileMenuOpen()"
+  >
+    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-semibold text-sm sm:text-lg flex-shrink-0 hover:bg-primary-700 sm:hover:bg-primary-600 transition-colors cursor-pointer sm:cursor-default">
+      {{ currentUser().name.charAt(0).toUpperCase() }}
+    </div>
+  </button>
+  
+  <!-- Desktop: Always visible -->
+  <div class="hidden sm:flex sm:flex-col">
     <span class="text-sm font-semibold text-gray-800">{{ currentUser().name }}</span>
     <span class="text-xs text-gray-600">{{ currentUser().location }}</span>
+  </div>
+
+  <!-- Mobile: Dropdown menu -->
+  <div
+    class="sm:hidden absolute top-full right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-3 min-w-[180px] z-50"
+    [class.hidden]="!isMobileMenuOpen()"
+  >
+    <div class="flex flex-col">
+      <span class="text-sm font-semibold text-gray-800">{{ currentUser().name }}</span>
+      <span class="text-xs text-gray-600 mt-1">{{ currentUser().location }}</span>
+    </div>
   </div>
 </div>
 

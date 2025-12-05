@@ -15,6 +15,7 @@ type LangType = 'en' | 'es' | 'fr';
 export class LandingComponent {
   activeTab = signal<TabType>('prompt');
   activeLang = signal<LangType>('en');
+  isMobileMenuOpen = signal<boolean>(false);
 
   switchTab(tab: TabType): void {
     this.activeTab.set(tab);
@@ -24,11 +25,21 @@ export class LandingComponent {
     this.activeLang.set(lang);
   }
 
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen.update(value => !value);
+  }
+
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen.set(false);
+  }
+
   scrollToSection(sectionId: string): void {
     const element = document.querySelector(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+    // Close mobile menu after navigation
+    this.closeMobileMenu();
   }
 }
 
