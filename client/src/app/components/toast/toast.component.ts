@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Toast } from '../../models/toast.model';
 
 @Component({
   selector: 'app-toast',
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div
       [class]="getToastClasses()"
