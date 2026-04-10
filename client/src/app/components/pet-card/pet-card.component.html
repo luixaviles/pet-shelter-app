@@ -1,6 +1,6 @@
 <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl animate-fade-in">
   <div class="relative h-56 overflow-hidden">
-    @if (pet().imageUrl?.startsWith('data:')) {
+    @if (pet().imageUrl.startsWith('data:')) {
       <img
         [src]="pet().imageUrl"
         [alt]="pet().name"

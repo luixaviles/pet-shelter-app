@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
+
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PetService } from '../../services/pet.service';
@@ -12,7 +12,7 @@ import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-add-pet',
-  imports: [ReactiveFormsModule, RouterLink, NgOptimizedImage],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './add-pet.component.html',
   styleUrls: ['./add-pet.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
