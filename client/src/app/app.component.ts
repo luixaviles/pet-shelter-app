@@ -4,12 +4,12 @@ import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router
 import { PetService } from './services/pet.service';
 import { UserWidgetComponent } from './components/user-widget/user-widget.component';
 import { ToastContainerComponent } from './components/toast-container/toast-container.component';
-import { GithubRibbonComponent } from './components/github-ribbon/github-ribbon.component';
+
 import { filter, map, startWith, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, RouterLink, UserWidgetComponent, ToastContainerComponent, GithubRibbonComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, UserWidgetComponent, ToastContainerComponent],
   template: `
     <div class="min-h-screen">
       <!-- <app-github-ribbon></app-github-ribbon> -->

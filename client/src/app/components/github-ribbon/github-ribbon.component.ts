@@ -1,9 +1,9 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-github-ribbon',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './github-ribbon.component.html',
   styleUrls: ['./github-ribbon.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

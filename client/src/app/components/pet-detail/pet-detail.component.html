@@ -15,7 +15,7 @@
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div class="md:flex">
             <div class="md:w-1/2">
-              @if (pet.imageUrl?.startsWith('data:')) {
+              @if (pet.imageUrl.startsWith('data:')) {
                 <img
                   [src]="pet.imageUrl"
                   [alt]="pet.name"

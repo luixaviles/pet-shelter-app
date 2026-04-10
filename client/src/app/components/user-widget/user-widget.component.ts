@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, inject, signal, HostListener, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-user-widget',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './user-widget.component.html',
   styleUrls: ['./user-widget.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
