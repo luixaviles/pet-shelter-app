@@ -24,23 +24,24 @@ The Pet Shelter App provides a modern, user-friendly platform for shelters to di
 - **AI-Powered Image Analysis (Prompt API)**: Automatically extract pet information from uploaded images using multimodal input (image + text) with Chrome's [Prompt API](https://developer.chrome.com/docs/ai/prompt-api)
 - **AI-Assisted Writing (Writer API)**: Generate creative and compelling pet descriptions using Chrome's [Writer API](https://developer.chrome.com/docs/ai/writer-api)
 - **Grammar & Spelling Correction (Proofreader API)**: Review and correct errors in grammar, spelling, and punctuation using Chrome's [Proofreader API](https://developer.chrome.com/docs/ai/proofreader-api)
-- **Multilingual Support (Translator API)**: Translate pet descriptions in the browser using Chrome's [Translator API](https://developer.chrome.com/docs/ai/translator-api) (supports English, Spanish, French)
-- **Responsive Design**: Fully responsive UI built with Tailwind CSS
+- **Multilingual Support (Translator API)**: Translate pet descriptions in the browser using Chrome's [Translator API](https://developer.chrome.com/docs/ai/translator-api) (supports English, Spanish, French, Japanese)
+- **Responsive Design**: Fully responsive UI built with Tailwind CSS, native Popover API, and View Transitions
 
 ## Technology Stack
 
 ### Frontend
-- **Angular** 20.0.0 - Modern web framework
+- **Angular** 21 - Modern web framework (Signals, Zoneless change detection, View Transitions)
 - **Tailwind CSS** 3.4.18 - Utility-first CSS framework
 - **TypeScript** 5.8.2 - Type-safe JavaScript
 - **RxJS** 7.8.1 - Reactive programming
 
 ### Backend
 - **Node.js** 22.20.0+ - JavaScript runtime
-- **Express.js** 4.18.2 - Web application framework
-- **TypeScript** 5.3.3 - Type-safe JavaScript
+- **Express.js** 5 - Web application framework
+- **TypeScript** 5.8 - Type-safe JavaScript
 - **Firebase Admin SDK** 13.5.0 - Backend Firebase services
 - **Multer** 2.0.2 - File upload handling
+- **Helmet & Express Rate Limit** - Security headers and API rate limiting
 
 ### Infrastructure
 - **Firebase Storage** - Image hosting and storage
@@ -123,14 +124,22 @@ GOOGLE_APPLICATION_CREDENTIALS=serviceAccount.json
 FIREBASE_STORAGE_BUCKET=your-firebase-storage-bucket.appspot.com
 PORT=3000
 NODE_ENV=development
+CORS_ORIGIN=http://localhost:4200
 ```
+(`CORS_ORIGIN` supports comma-separated origins and defaults to `*` in development if unset.)
 
 5. Build the TypeScript code:
 ```bash
 npm run build
 ```
 
-6. Start the server:
+6. Run tests and linting:
+```bash
+npm test
+npm run lint
+```
+
+7. Start the server:
 ```bash
 # Development mode with auto-reload
 npm run dev
@@ -140,6 +149,8 @@ npm start
 ```
 
 The server will run on `http://localhost:3000` by default.
+
+**Docker:** The `server/Dockerfile` installs dependencies cleanly with `npm ci`, runs as the non-root `node` user, and starts the compiled server directly via `node dist/server.js`.
 
 ### Frontend Setup
 
@@ -178,6 +189,11 @@ npm run build
 ```
 
 The production build will be in `dist/demo/browser`.
+
+6. Run unit tests:
+```bash
+npm test
+```
 
 ## AI Features
 
@@ -266,6 +282,7 @@ Chrome's [Translator API](https://developer.chrome.com/docs/ai/translator-api) e
 - **English** (en) - Default source language
 - **Spanish** (es) - Available for translation
 - **French** (fr) - Available for translation
+- **Japanese** (ja) - Available for translation
 
 **Features:**
 - **Client-side Translation**: All translation happens in the browser
