@@ -25,6 +25,6 @@ export interface CreatePetDto {
   location: string;
   adoptionDate: string;
   imageUrl: string;
-  description: string;
+  description?: string;
 }
 

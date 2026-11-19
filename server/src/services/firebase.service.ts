@@ -8,6 +8,35 @@ import {
   FIREBASE_STORAGE_BUCKET,
 } from '../config/config';
 
+const MIME_TO_EXTENSION: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+  'image/avif': 'avif',
+  'image/svg+xml': 'svg',
+  'image/bmp': 'bmp',
+  'image/tiff': 'tiff',
+};
+
+export function getExtensionForMimeType(mimeType: string): string {
+  const normalized = mimeType.toLowerCase().split(';')[0].trim();
+  if (normalized in MIME_TO_EXTENSION) {
+    return MIME_TO_EXTENSION[normalized];
+  }
+
+  if (normalized.startsWith('image/')) {
+    const subtype = normalized.slice('image/'.length).split('+')[0];
+    const sanitized = subtype.replace(/[^a-z0-9]/g, '');
+    if (sanitized.length > 0) {
+      return sanitized;
+    }
+  }
+
+  return 'png';
+}
+
 class FirebaseService {
   private static instance: FirebaseService;
   private initialized = false;
@@ -55,7 +84,8 @@ class FirebaseService {
 
   public async uploadImageToStorage(
     imageBuffer: Buffer,
-    animalType: 'cat' | 'dog'
+    animalType: 'cat' | 'dog',
+    mimeType = 'image/png'
   ): Promise<string> {
     if (!this.initialized) {
       throw new Error('Firebase Service is not initialized');
@@ -64,12 +94,14 @@ class FirebaseService {
     try {
       const bucket = getStorage().bucket();
       const nanoidValue = nanoid(10);
-      const fileName = `images/${animalType}-${nanoidValue}.png`;
+      const normalizedMimeType = mimeType.toLowerCase().split(';')[0].trim() || 'image/png';
+      const extension = getExtensionForMimeType(normalizedMimeType);
+      const fileName = `images/${animalType}-${nanoidValue}.${extension}`;
       const file = bucket.file(fileName);
 
       await file.save(imageBuffer, {
         metadata: {
-          contentType: 'image/png',
+          contentType: normalizedMimeType,
         },
       });
 

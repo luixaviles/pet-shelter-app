@@ -8,9 +8,9 @@ WORKDIR /usr/src/app
 # This stage is dedicated to installing NPM dependencies.
 # It's separated to leverage Docker's layer caching.
 FROM base AS dependencies
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 # Install all dependencies, including devDependencies needed for the build
-RUN npm install
+RUN npm ci
 
 # ---- Build Stage ----
 # This stage compiles the TypeScript code into JavaScript.
@@ -26,24 +26,23 @@ FROM base AS production
 ENV NODE_ENV=production
 
 # Copy necessary files from previous stages
-COPY package.json package-lock.json* ./
-
-# Install pm2 globally
-RUN npm install -g pm2@latest
+COPY --chown=node:node package.json package-lock.json ./
 
 # Install only production dependencies
-RUN npm install --omit=dev
+RUN npm ci --omit=dev && chown -R node:node /usr/src/app
 
 # Copy the compiled code from the build stage
-COPY --from=build /usr/src/app/dist ./dist
+COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 
 # Copy JSON data
-COPY --from=build /usr/src/app/data ./data
+COPY --chown=node:node --from=build /usr/src/app/data ./data
+
+# Run as non-root user
+USER node
 
 # Expose the port the app runs on
 # This should be mapped to the host in the `docker run` command.
 EXPOSE 3000
 
-# The command to run the application using pm2-runtime.
-# This ensures the app is managed and restarted correctly.
-CMD ["pm2-runtime", "dist/server.js"] 
+# Run the compiled Node.js server directly
+CMD ["node", "dist/server.js"]

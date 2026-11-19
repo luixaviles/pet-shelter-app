@@ -43,8 +43,8 @@ export const errorHandler = (
     }
   }
 
-  // Use custom error message if available
-  if (err.message) {
+  // Use custom error message if no specific handler matched
+  if (errorMessage === 'Internal server error' && err.message) {
     errorMessage = err.message;
   }
 
