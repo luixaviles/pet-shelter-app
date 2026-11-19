@@ -269,6 +269,8 @@ Chrome's [Proofreader API](https://developer.chrome.com/docs/ai/proofreader-api)
 
 **Location:** Used in `AddPetComponent` via `ProofreaderService`
 
+**Chrome Flag:** Enable `chrome://flags/#proofreader-api` (older builds: `#proofreader-api-for-gemini-nano`) and relaunch Chrome.
+
 ### Translator API - Multilingual Description Support
 
 Chrome's [Translator API](https://developer.chrome.com/docs/ai/translator-api) enables in-browser translation of pet descriptions, allowing users to view content in their preferred language.
@@ -302,9 +304,12 @@ Chrome's [Translator API](https://developer.chrome.com/docs/ai/translator-api) e
 ### AI Features Availability & Requirements
 
 **Browser Requirements:**
-- Chrome browser with built-in AI APIs enabled
+- Chrome browser (or Chrome Canary) with built-in AI APIs enabled
 - APIs must be available in the current browser context
-- Origin trial registration may be required for some APIs
+- For local testing of experimental APIs, enable the corresponding flags and relaunch Chrome:
+  - `chrome://flags/#optimization-guide-on-device-model` → **Enabled BypassPerfRequirement**
+  - `chrome://flags/#proofreader-api` → **Enabled** (required for the Proofreader API)
+- Origin trial registration may be required for some APIs in production
 
 **Hardware Requirements:**
 - **Storage**: At least 22 GB free space (models are removed if space falls below 10 GB)
