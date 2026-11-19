@@ -1,35 +1,31 @@
 <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
   <div class="max-w-3xl mx-auto">
-    <button
+    <a
       routerLink="/pet/list"
-      class="mb-6 flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200 animate-fade-in"
+      class="mb-6 inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200 animate-fade-in"
     >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
       </svg>
       Back to All Pets
-    </button>
+    </a>
 
     <div class="bg-white rounded-2xl shadow-xl p-8 animate-fade-in">
       <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Add New Pet</h1>
 
       <form [formGroup]="petForm" (ngSubmit)="onSubmit()" class="space-y-6">
         <section>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Pet Image <span class="text-red-500">*</span>
-          </label>
-          <div
-            role="button"
-            tabindex="0"
-            (keydown.enter)="fileInput.click()"
-            (keydown.space)="fileInput.click()"
-            (click)="fileInput.click()"
+          <span class="block text-sm font-semibold text-gray-700 mb-2">
+            Pet Image <span class="text-red-500" aria-hidden="true">*</span>
+          </span>
+          <label
+            for="pet-image-input"
             (dragover)="onDragOver($event)"
             (dragleave)="onDragLeave($event)"
             (drop)="onDrop($event)"
-            [class.border-primary-500]="isDragOver"
-            [class.bg-primary-50]="isDragOver"
-            class="flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer transition-colors"
+            [class.border-primary-500]="isDragOver()"
+            [class.bg-primary-50]="isDragOver()"
+            class="flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500"
           >
             <div class="text-gray-500">
               <p class="font-semibold">Drag & drop an image here</p>
@@ -38,25 +34,26 @@
             </div>
             <input
               #fileInput
+              id="pet-image-input"
               type="file"
               accept="image/*"
-              class="hidden"
+              class="sr-only"
               (change)="onFileInputChange($event)"
             />
-          </div>
-          @if (imageError) {
-            <p class="mt-2 text-sm text-red-600">{{ imageError }}</p>
+          </label>
+          @if (imageError()) {
+            <p role="alert" class="mt-2 text-sm text-red-600">{{ imageError() }}</p>
           }
 
-          @if (imagePreview) {
+          @if (imagePreview()) {
             <div class="mt-4">
               <div class="flex items-center justify-between mb-2">
                 <p class="text-sm text-gray-600">Preview</p>
                 <button type="button" (click)="removeImage()" class="text-red-600 hover:text-red-700 text-sm font-semibold">Remove image</button>
               </div>
               <img
-                [src]="imagePreview"
-                alt="Preview"
+                [src]="imagePreview()"
+                alt="Selected pet preview"
                 width="640"
                 height="400"
                 class="w-full max-w-md rounded-lg shadow-md mx-auto"
@@ -65,12 +62,12 @@
                 <button
                   type="button"
                   aria-label="Autofill from image using AI"
-                  [disabled]="!imagePreview || isAiLoading"
+                  [disabled]="!imagePreview() || isAiLoading()"
                   (click)="onAiAutofillClick()"
-                  [attr.aria-busy]="isAiLoading"
+                  [attr.aria-busy]="isAiLoading()"
                   class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 text-white font-semibold px-3 py-2 rounded-md transition-colors text-sm"
                 >
-                  @if (isAiLoading) {
+                  @if (isAiLoading()) {
                     <span class="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
                     <span>Autofill</span>
                   } @else {
@@ -83,15 +80,15 @@
                 <p class="text-xs text-gray-500 mt-2">Processes your image to suggest fields. You can edit before saving.</p>
                 <p class="text-xs text-gray-400">Requires Chrome Prompt API with image input</p>
               </div>
-              @if (aiError) {
-                <div class="mt-3 bg-red-50 text-red-700 border border-red-200 rounded-lg p-3 text-sm flex items-center justify-between">
-                  <span>{{ aiError }}</span>
+              @if (aiError()) {
+                <div role="alert" class="mt-3 bg-red-50 text-red-700 border border-red-200 rounded-lg p-3 text-sm flex items-center justify-between">
+                  <span>{{ aiError() }}</span>
                   <button type="button" (click)="retryAiAutofill()" class="underline font-semibold">Retry</button>
                 </div>
               }
-              @if (aiSummary) {
-                <div class="mt-3 bg-blue-50 text-blue-800 border border-blue-200 rounded-lg p-3 text-sm flex items-center justify-between">
-                  <span>{{ aiSummary }}</span>
+              @if (aiSummary()) {
+                <div aria-live="polite" class="mt-3 bg-blue-50 text-blue-800 border border-blue-200 rounded-lg p-3 text-sm flex items-center justify-between">
+                  <span>{{ aiSummary() }}</span>
                   <button type="button" (click)="dismissAiSummary()" class="underline font-semibold">Dismiss</button>
                 </div>
               }
@@ -100,12 +97,14 @@
         </section>
 
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Pet Name <span class="text-red-500">*</span>
+          <label for="pet-name" class="block text-sm font-semibold text-gray-700 mb-2">
+            Pet Name <span class="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
+            id="pet-name"
             type="text"
             formControlName="name"
+            required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
             placeholder="Enter pet name"
           />
@@ -118,11 +117,13 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Animal Type <span class="text-red-500">*</span>
+          <label for="pet-animal-type" class="block text-sm font-semibold text-gray-700 mb-2">
+            Animal Type <span class="text-red-500" aria-hidden="true">*</span>
           </label>
           <select
+            id="pet-animal-type"
             formControlName="animalType"
+            required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
           >
             <option value="">Select animal type</option>
@@ -137,12 +138,14 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Breed <span class="text-red-500">*</span>
+          <label for="pet-breed" class="block text-sm font-semibold text-gray-700 mb-2">
+            Breed <span class="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
+            id="pet-breed"
             type="text"
             formControlName="breed"
+            required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
             placeholder="Enter breed"
           />
@@ -153,25 +156,29 @@
           }
         </div>
 
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Gender <span class="text-red-500">*</span>
-          </label>
+        <fieldset>
+          <legend class="block text-sm font-semibold text-gray-700 mb-2">
+            Gender <span class="text-red-500" aria-hidden="true">*</span>
+          </legend>
           <div class="flex gap-6">
-            <label class="flex items-center cursor-pointer">
+            <label for="pet-gender-male" class="flex items-center cursor-pointer">
               <input
+                id="pet-gender-male"
                 type="radio"
                 formControlName="gender"
                 value="male"
+                required
                 class="w-4 h-4 text-primary-600 focus:ring-primary-500"
               />
               <span class="ml-2 text-gray-700">Male</span>
             </label>
-            <label class="flex items-center cursor-pointer">
+            <label for="pet-gender-female" class="flex items-center cursor-pointer">
               <input
+                id="pet-gender-female"
                 type="radio"
                 formControlName="gender"
                 value="female"
+                required
                 class="w-4 h-4 text-primary-600 focus:ring-primary-500"
               />
               <span class="ml-2 text-gray-700">Female</span>
@@ -182,19 +189,21 @@
               Gender is required.
             </div>
           }
-        </div>
+        </fieldset>
 
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Age <span class="text-red-500">*</span>
-          </label>
+        <fieldset>
+          <legend class="block text-sm font-semibold text-gray-700 mb-2">
+            Age <span class="text-red-500" aria-hidden="true">*</span>
+          </legend>
           <div class="flex gap-4">
             <div class="flex-1">
-              <label class="block text-xs text-gray-600 mb-1">Years</label>
+              <label for="pet-age-years" class="block text-xs text-gray-600 mb-1">Years</label>
               <input
+                id="pet-age-years"
                 type="number"
                 formControlName="ageYears"
                 min="0"
+                required
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
                 placeholder="0"
               />
@@ -206,12 +215,14 @@
               }
             </div>
             <div class="flex-1">
-              <label class="block text-xs text-gray-600 mb-1">Months</label>
+              <label for="pet-age-months" class="block text-xs text-gray-600 mb-1">Months</label>
               <input
+                id="pet-age-months"
                 type="number"
                 formControlName="ageMonths"
                 min="0"
                 max="11"
+                required
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
                 placeholder="0"
               />
@@ -229,15 +240,17 @@
               At least one of years or months must be greater than 0.
             </div>
           }
-        </div>
+        </fieldset>
 
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Location <span class="text-red-500">*</span>
+          <label for="pet-location" class="block text-sm font-semibold text-gray-700 mb-2">
+            Location <span class="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
+            id="pet-location"
             type="text"
             formControlName="location"
+            required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
             placeholder="City, State"
           />
@@ -249,13 +262,15 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            Adoption Date Available <span class="text-red-500">*</span>
+          <label for="pet-adoption-date" class="block text-sm font-semibold text-gray-700 mb-2">
+            Adoption Date Available <span class="text-red-500" aria-hidden="true">*</span>
           </label>
           <input
+            id="pet-adoption-date"
             type="date"
             formControlName="adoptionDate"
             [min]="getTodayDateString()"
+            required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all"
           />
           @if (petForm.get('adoptionDate')?.invalid && petForm.get('adoptionDate')?.touched) {
@@ -270,22 +285,20 @@
           }
         </div>
 
-        
-
         <div>
           <div class="flex items-center justify-between mb-2">
-            <label class="block text-sm font-semibold text-gray-700">
+            <label for="pet-description" class="block text-sm font-semibold text-gray-700">
               Description
             </label>
-            @if ((petForm.get('description')?.value?.length ?? 0) >= 10) {
+            @if (descriptionLength() >= 10) {
               <div class="flex items-center gap-4">
                 <button
                   type="button"
                   (click)="onProofreadClick()"
-                  [disabled]="isProofreading"
+                  [disabled]="isProofreading()"
                   class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 disabled:text-gray-400 text-sm font-semibold"
                 >
-                  @if (isProofreading) {
+                  @if (isProofreading()) {
                     <span class="inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
                     <span>Proofread</span>
                   } @else {
@@ -299,10 +312,10 @@
                 <button
                   type="button"
                   (click)="onImproveDescriptionClick()"
-                  [disabled]="isImprovingDescription"
+                  [disabled]="isImprovingDescription()"
                   class="inline-flex items-center gap-2 text-primary-700 hover:text-primary-800 disabled:text-gray-400 text-sm font-semibold"
                 >
-                  @if (isImprovingDescription) {
+                  @if (isImprovingDescription()) {
                     <span class="inline-block h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
                     <span>Improve description</span>
                   } @else {
@@ -315,31 +328,33 @@
               </div>
             }
           </div>
+          <p id="pet-description-hint" class="mb-2 text-sm text-gray-500">Optional: 3-4 sentences about the pet</p>
           <textarea
+            id="pet-description"
             formControlName="description"
             rows="4"
+            aria-describedby="pet-description-hint"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none transition-all resize-y"
             placeholder="Tell us about this pet (personality, preferences, etc.)"
           ></textarea>
-          <p class="mt-1 text-sm text-gray-500">Optional: 3-4 sentences about the pet</p>
-          @if (isProofreading) {
+          @if (isProofreading()) {
             <div class="mt-4 flex items-center gap-3 text-sm text-gray-600">
               <span class="inline-block h-4 w-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
-              @if (proofreadProgress > 0) {
-                <span>Downloading proofreader model... {{ proofreadProgress.toFixed(0) }}%</span>
+              @if (proofreadProgress() > 0) {
+                <span>Downloading proofreader model... {{ proofreadProgress().toFixed(0) }}%</span>
               } @else {
                 <span>Proofreading...</span>
               }
             </div>
           }
-          @if (proofreadError) {
-            <div class="mt-2 bg-red-50 text-red-700 border border-red-200 rounded-lg p-2 text-sm">
-              {{ proofreadError }}
+          @if (proofreadError()) {
+            <div role="alert" class="mt-2 bg-red-50 text-red-700 border border-red-200 rounded-lg p-2 text-sm">
+              {{ proofreadError() }}
             </div>
           }
-          @if (improveDescError) {
-            <div class="mt-2 bg-red-50 text-red-700 border border-red-200 rounded-lg p-2 text-sm">
-              {{ improveDescError }}
+          @if (improveDescError()) {
+            <div role="alert" class="mt-2 bg-red-50 text-red-700 border border-red-200 rounded-lg p-2 text-sm">
+              {{ improveDescError() }}
             </div>
           }
         </div>
@@ -347,18 +362,17 @@
         <div class="flex gap-4 pt-4">
           <button
             type="submit"
-            [disabled]="petForm.invalid || isSubmitting"
+            [disabled]="petForm.invalid || isSubmitting()"
             class="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
-            {{ isSubmitting ? 'Adding Pet...' : 'Add Pet' }}
+            {{ isSubmitting() ? 'Adding Pet...' : 'Add Pet' }}
           </button>
-          <button
-            type="button"
+          <a
             routerLink="/pet/list"
-            class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+            class="flex-1 inline-flex items-center justify-center bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
           >
             Cancel
-          </button>
+          </a>
         </div>
       </form>
     </div>

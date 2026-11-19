@@ -1,35 +1,27 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { PetService } from '../../services/pet.service';
-import { Pet, AnimalTypeFilter, GenderFilter } from '../../models/pet.model';
+import { AnimalTypeFilter, GenderFilter } from '../../models/pet.model';
 import { PetCardComponent } from '../pet-card/pet-card.component';
 
 @Component({
   selector: 'app-pet-list',
-  imports: [CommonModule, PetCardComponent],
+  imports: [PetCardComponent],
   templateUrl: './pet-list.component.html',
   styleUrls: ['./pet-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PetListComponent implements OnInit {
-  filteredPets$!: Observable<Pet[]>;
-  currentAnimalType: AnimalTypeFilter = 'all';
-  currentGender: GenderFilter = 'all';
-
+export class PetListComponent {
   private petService = inject(PetService);
 
-  ngOnInit(): void {
-    this.filteredPets$ = this.petService.filteredPets$;
-  }
+  readonly filteredPets = this.petService.filteredPets;
+  readonly currentAnimalType = this.petService.animalTypeFilter;
+  readonly currentGender = this.petService.genderFilter;
 
   setAnimalTypeFilter(filter: AnimalTypeFilter): void {
-    this.currentAnimalType = filter;
     this.petService.setAnimalTypeFilter(filter);
   }
 
   setGenderFilter(filter: GenderFilter): void {
-    this.currentGender = filter;
     this.petService.setGenderFilter(filter);
   }
 }

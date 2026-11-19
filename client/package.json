@@ -5,10 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "test": "vitest run --environment jsdom",
     "deploy:prod": "ng build --configuration production && firebase deploy"
   },
   "dependencies": {
-    "@angular/animations": "^21.2.8",
     "@angular/common": "^21.2.8",
     "@angular/compiler": "^21.2.8",
     "@angular/core": "^21.2.8",
@@ -22,11 +22,12 @@
     "@angular/build": "^21.2.7",
     "@angular/cli": "^21.2.7",
     "@angular/compiler-cli": "^21.2.8",
-    "@tailwindcss/postcss": "^4.1.16",
     "autoprefixer": "^10.4.21",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^4.0.8"
   }
 }
