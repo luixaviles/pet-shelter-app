@@ -44,15 +44,20 @@ export class AiAssistService {
 
     const LanguageModel: any = (globalThis as any).LanguageModel;
     const session = await LanguageModel.create({ expectedInputs: [{ type: 'image' }] });
-    const response = await session.prompt([
-      {
-        role: 'user',
-        content: [
-          { type: 'text', value: prompt },
-          { type: 'image', value: imageEl },
-        ],
-      },
-    ]);
+    let response: unknown;
+    try {
+      response = await session.prompt([
+        {
+          role: 'user',
+          content: [
+            { type: 'text', value: prompt },
+            { type: 'image', value: imageEl },
+          ],
+        },
+      ]);
+    } finally {
+      session.destroy?.();
+    }
 
     const rawText = String(response);
 

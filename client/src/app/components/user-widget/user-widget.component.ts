@@ -1,6 +1,8 @@
-import { Component, ChangeDetectionStrategy, inject, signal, HostListener, ElementRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 
 import { UserService } from '../../services/user.service';
+
+let nextPopoverId = 0;
 
 @Component({
   selector: 'app-user-widget',
@@ -11,23 +13,12 @@ import { UserService } from '../../services/user.service';
 })
 export class UserWidgetComponent {
   private userService = inject(UserService);
-  private elementRef = inject(ElementRef);
   currentUser = this.userService.currentUser;
+  popoverId = `user-menu-popover-${++nextPopoverId}`;
   isMobileMenuOpen = signal<boolean>(false);
 
-  toggleMobileMenu(): void {
-    this.isMobileMenuOpen.update(value => !value);
-  }
-
-  closeMobileMenu(): void {
-    this.isMobileMenuOpen.set(false);
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    if (this.isMobileMenuOpen() && !this.elementRef.nativeElement.contains(event.target)) {
-      this.closeMobileMenu();
-    }
+  onPopoverToggle(event: Event): void {
+    const toggleEvent = event as Event & { newState?: string };
+    this.isMobileMenuOpen.set(toggleEvent.newState === 'open');
   }
 }
-

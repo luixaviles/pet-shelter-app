@@ -1,32 +1,59 @@
 import 'dotenv/config';
 import express, { type Express } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import petsRoutes from './routes/pets.routes';
 import { errorHandler } from './middleware/error-handler.middleware';
-import { PORT } from './config/config';
+import { CORS_ORIGIN, NODE_ENV, PORT, parseCorsOrigin } from './config/config';
 
-const app: Express = express();
+export function createApp(): Express {
+  const app: Express = express();
 
-// CORS configuration
-app.use(
-  cors({
-    origin: '*', // Allow all origins - can be configured via environment variable
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+  // Security headers
+  app.use(helmet());
 
-// Body parser middleware
-app.use(express.json());
+  // CORS configuration
+  app.use(
+    cors({
+      origin: parseCorsOrigin(CORS_ORIGIN, NODE_ENV),
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    })
+  );
 
-// Routes
-app.use('/api/pets', petsRoutes);
+  // Body parser middleware
+  app.use(express.json());
 
-// Error handling middleware (must be last)
-app.use(errorHandler);
+  // Rate limiting on pet creation endpoint
+  const createPetLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 20,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: {
+      success: false,
+      error: 'Too many requests, please try again later.',
+    },
+  });
+  app.post('/api/pets', createPetLimiter);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+  // Routes
+  app.use('/api/pets', petsRoutes);
+
+  // Error handling middleware (must be last)
+  app.use(errorHandler);
+
+  return app;
+}
+
+const app = createApp();
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+export default app;
 

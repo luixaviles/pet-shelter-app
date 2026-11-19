@@ -1,3 +1,31 @@
-// Component-specific styles if needed
-// Most styling handled by Tailwind CSS
+// Native popover and CSS Anchor Positioning with @supports progressive enhancement
 
+.user-popover:is(:popover-open, .\:popover-open) {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  .user-popover:is(:popover-open, .\:popover-open) {
+    display: none;
+  }
+}
+
+@supports (position-area: block-end) {
+  .user-popover {
+    inset: auto;
+    margin: 0;
+    margin-block-start: 0.5rem;
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+}
+
+@supports not (position-area: block-end) {
+  .user-popover {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: auto;
+    margin: 0;
+    border-radius: 0.75rem 0.75rem 0 0;
+  }
+}

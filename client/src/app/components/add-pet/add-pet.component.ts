@@ -1,9 +1,9 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
-
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 import { PetService } from '../../services/pet.service';
-import { Pet } from '../../models/pet.model';
 import { AiAssistService, PetImageAnalysis } from '../../services/ai-assist.service';
 import { WriterAssistService } from '../../services/writer-assist.service';
 import { ProofreaderService } from '../../services/proofreader.service';
@@ -19,21 +19,20 @@ import { ToastService } from '../../services/toast.service';
 })
 export class AddPetComponent {
   petForm: FormGroup;
-  imagePreview: string = '';
-  selectedImageFile: File | null = null;
-  isSubmitting: boolean = false;
-  isDragOver: boolean = false;
-  imageError: string | null = null;
-  // AI Autofill UI state (skeleton – service wiring added later)
-  isAiLoading: boolean = false;
-  aiSummary: string | null = null;
-  aiError: string | null = null;
-  allowOverwrite: boolean = false;
-  isImprovingDescription: boolean = false;
-  improveDescError: string | null = null;
-  isProofreading: boolean = false;
-  proofreadProgress: number = 0;
-  proofreadError: string | null = null;
+  readonly imagePreview = signal('');
+  readonly selectedImageFile = signal<File | null>(null);
+  readonly isSubmitting = signal(false);
+  readonly isDragOver = signal(false);
+  readonly imageError = signal<string | null>(null);
+  readonly isAiLoading = signal(false);
+  readonly aiSummary = signal<string | null>(null);
+  readonly aiError = signal<string | null>(null);
+  readonly isImprovingDescription = signal(false);
+  readonly improveDescError = signal<string | null>(null);
+  readonly isProofreading = signal(false);
+  readonly proofreadProgress = signal(0);
+  readonly proofreadError = signal<string | null>(null);
+  readonly descriptionLength: () => number;
   private lastAiResult: PetImageAnalysis | null = null;
 
   private static readonly MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
@@ -41,7 +40,6 @@ export class AddPetComponent {
   private fb = inject(FormBuilder);
   private petService = inject(PetService);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
   private aiAssist = inject(AiAssistService);
   private writerAssist = inject(WriterAssistService);
   private proofreaderService = inject(ProofreaderService);
@@ -61,6 +59,13 @@ export class AddPetComponent {
       imageUrl: [''], // Keep for preview purposes, not for validation
       description: ['']
     }, { validators: this.ageValidator });
+
+    this.descriptionLength = toSignal(
+      this.petForm.controls['description'].valueChanges.pipe(
+        map(value => String(value ?? '').length)
+      ),
+      { initialValue: 0 }
+    );
   }
 
   private dateNotInPastValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -108,19 +113,17 @@ export class AddPetComponent {
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
-    this.isDragOver = true;
-    this.cdr.markForCheck();
+    this.isDragOver.set(true);
   }
 
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
-    this.isDragOver = false;
-    this.cdr.markForCheck();
+    this.isDragOver.set(false);
   }
 
   onDrop(event: DragEvent): void {
     event.preventDefault();
-    this.isDragOver = false;
+    this.isDragOver.set(false);
     const file = event.dataTransfer?.files?.[0];
     if (file) {
       this.handleSelectedFile(file);
@@ -138,39 +141,35 @@ export class AddPetComponent {
   }
 
   private handleSelectedFile(file: File): void {
-    this.imageError = null;
+    this.imageError.set(null);
     if (!file.type.startsWith('image/')) {
-      this.imageError = 'Only image files are allowed.';
-      this.cdr.markForCheck();
+      this.imageError.set('Only image files are allowed.');
       return;
     }
     if (file.size > AddPetComponent.MAX_IMAGE_BYTES) {
-      this.imageError = 'Image is too large (max 5MB).';
-      this.cdr.markForCheck();
+      this.imageError.set('Image is too large (max 5MB).');
       return;
     }
     
     // Store the File object for FormData submission
-    this.selectedImageFile = file;
+    this.selectedImageFile.set(file);
     
     // Reset form fields when a new valid image is loaded (except imageUrl which will be set below)
     // Only reset if there was a previous image, to avoid clearing manually entered data on first load
-    if (this.imagePreview) {
+    if (this.imagePreview()) {
       this.resetFormFields();
     }
     
     this.loadFileAsDataUrl(file)
       .then(dataUrl => {
-        this.imagePreview = dataUrl;
+        this.imagePreview.set(dataUrl);
         this.petForm.get('imageUrl')?.setValue(dataUrl);
         this.petForm.get('imageUrl')?.markAsDirty();
         this.petForm.get('imageUrl')?.markAsTouched();
-        this.cdr.markForCheck();
       })
       .catch(() => {
-        this.imageError = 'Failed to load image. Please try a different file.';
-        this.selectedImageFile = null;
-        this.cdr.markForCheck();
+        this.imageError.set('Failed to load image. Please try a different file.');
+        this.selectedImageFile.set(null);
       });
   }
 
@@ -193,8 +192,8 @@ export class AddPetComponent {
     });
     
     // Reset AI-related state
-    this.aiSummary = null;
-    this.aiError = null;
+    this.aiSummary.set(null);
+    this.aiError.set(null);
     this.lastAiResult = null;
     // Note: selectedImageFile is not reset here as it's set when a new file is selected
   }
@@ -209,34 +208,33 @@ export class AddPetComponent {
   }
 
   removeImage(): void {
-    this.imagePreview = '';
-    this.selectedImageFile = null;
+    this.imagePreview.set('');
+    this.selectedImageFile.set(null);
     this.petForm.get('imageUrl')?.setValue('');
     this.petForm.get('imageUrl')?.markAsDirty();
     this.petForm.get('imageUrl')?.markAsTouched();
-    this.cdr.markForCheck();
   }
 
   async onAiAutofillClick(): Promise<void> {
-    if (!this.imagePreview || this.isAiLoading) {
+    const preview = this.imagePreview();
+    if (!preview || this.isAiLoading()) {
       return;
     }
-    this.aiError = null;
-    this.aiSummary = null;
-    this.isAiLoading = true;
-    this.cdr.markForCheck();
+    this.aiError.set(null);
+    this.aiSummary.set(null);
+    this.isAiLoading.set(true);
 
     try {
       if (!this.aiAssist.isPromptApiAvailable()) {
         throw new Error('Chrome Prompt API with image input is unavailable.');
       }
-      const result: PetImageAnalysis = await this.aiAssist.analyzePetImage(this.imagePreview);
+      const result: PetImageAnalysis = await this.aiAssist.analyzePetImage(preview);
       // Required output: log to console for now
       console.log('[Autofill]', result);
       this.lastAiResult = result;
       const label = result.animal && result.animal !== 'unknown' ? result.animal : 'unknown animal';
       const breed = result.breed || 'unknown breed';
-      this.aiSummary = `Detected: ${label} • ${breed}`;
+      this.aiSummary.set(`Detected: ${label} • ${breed}`);
 
       // Populate form fields (fill empty fields; do not overwrite user's entries)
       const form = this.petForm;
@@ -284,17 +282,15 @@ export class AddPetComponent {
       setIfEmpty('location', userLocation);
     } catch (err: any) {
       const message = err?.message || 'Failed to analyze image. Please try again.';
-      this.aiError = message;
+      this.aiError.set(message);
       console.error('[Autofill][error]', err);
     } finally {
-      this.isAiLoading = false;
-      this.cdr.markForCheck();
+      this.isAiLoading.set(false);
     }
   }
 
   dismissAiSummary(): void {
-    this.aiSummary = null;
-    this.cdr.markForCheck();
+    this.aiSummary.set(null);
   }
 
   retryAiAutofill(): void {
@@ -304,13 +300,12 @@ export class AddPetComponent {
   async onImproveDescriptionClick(): Promise<void> {
     const control = this.petForm.get('description');
     const current = String(control?.value ?? '').trim();
-    if (!current || current.length < 10 || this.isImprovingDescription) {
+    if (!current || current.length < 10 || this.isImprovingDescription()) {
       return;
     }
     
-    this.improveDescError = null;
-    this.isImprovingDescription = true;
-    this.cdr.markForCheck();
+    this.improveDescError.set(null);
+    this.isImprovingDescription.set(true);
 
     try {
       const availability = await this.writerAssist.isWriterAvailable();
@@ -346,26 +341,23 @@ export class AddPetComponent {
       control?.markAsTouched();
     } catch (err: any) {
       const message = err?.message || 'Failed to improve description. Please try again.';
-      this.improveDescError = message;
-      this.cdr.markForCheck();
+      this.improveDescError.set(message);
       console.error('[Improve Description][error]', err);
     } finally {
-      this.isImprovingDescription = false;
-      this.cdr.markForCheck();
+      this.isImprovingDescription.set(false);
     }
   }
 
   async onProofreadClick(): Promise<void> {
     const control = this.petForm.get('description');
     const current = String(control?.value ?? '').trim();
-    if (!current || current.length < 10 || this.isProofreading) {
+    if (!current || current.length < 10 || this.isProofreading()) {
       return;
     }
 
-    this.proofreadError = null;
-    this.proofreadProgress = 0;
-    this.isProofreading = true;
-    this.cdr.markForCheck();
+    this.proofreadError.set(null);
+    this.proofreadProgress.set(0);
+    this.isProofreading.set(true);
 
     try {
       if (!this.proofreaderService.isProofreaderAvailable()) {
@@ -375,8 +367,7 @@ export class AddPetComponent {
       const corrected = await this.proofreaderService.proofreadText(
         current,
         (progress) => {
-          this.proofreadProgress = progress;
-          this.cdr.markForCheck();
+          this.proofreadProgress.set(progress);
         }
       );
 
@@ -387,27 +378,24 @@ export class AddPetComponent {
       control?.markAsTouched();
     } catch (err: any) {
       const message = err?.message || 'Failed to proofread description. Please try again.';
-      this.proofreadError = message;
-      this.cdr.markForCheck();
+      this.proofreadError.set(message);
       console.error('[Proofread][error]', err);
     } finally {
-      this.isProofreading = false;
-      this.proofreadProgress = 0;
-      this.cdr.markForCheck();
+      this.isProofreading.set(false);
+      this.proofreadProgress.set(0);
     }
   }
 
   onSubmit(): void {
     // Validate that an image file is selected
-    if (!this.selectedImageFile) {
-      this.imageError = 'Please select an image file.';
-      this.cdr.markForCheck();
+    const imageFile = this.selectedImageFile();
+    if (!imageFile) {
+      this.imageError.set('Please select an image file.');
       return;
     }
 
     if (this.petForm.valid) {
-      this.isSubmitting = true;
-      this.cdr.markForCheck();
+      this.isSubmitting.set(true);
 
       const formValue = this.petForm.value;
       const ageYears = Number(formValue.ageYears) || 0;
@@ -415,7 +403,7 @@ export class AddPetComponent {
 
       // Create FormData for multipart/form-data request
       const formData = new FormData();
-      formData.append('image', this.selectedImageFile);
+      formData.append('image', imageFile);
       formData.append('name', formValue.name);
       formData.append('animalType', formValue.animalType);
       formData.append('breed', formValue.breed);
@@ -431,10 +419,9 @@ export class AddPetComponent {
           this.router.navigate(['/pet/list']);
         },
         error: (error) => {
-          this.isSubmitting = false;
+          this.isSubmitting.set(false);
           const errorMessage = error?.error?.error || error?.message || 'Failed to create pet. Please try again.';
           this.toastService.error(`Error: ${errorMessage}`);
-          this.cdr.markForCheck();
         }
       });
     } else {

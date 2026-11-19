@@ -1,6 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, BehaviorSubject, combineLatest, map, catchError, of } from 'rxjs';
+import { Observable, map, catchError, of } from 'rxjs';
 import { Pet, AnimalTypeFilter, GenderFilter } from '../models/pet.model';
 import { ApiResponse } from '../models/api-response.model';
 import { environment } from '../../environments/environment';
@@ -9,29 +9,26 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class PetService {
-  private petsSubject = new BehaviorSubject<Pet[]>([]);
-  private animalTypeFilterSubject = new BehaviorSubject<AnimalTypeFilter>('all');
-  private genderFilterSubject = new BehaviorSubject<GenderFilter>('all');
+  private http = inject(HttpClient);
 
-  pets$ = this.petsSubject.asObservable();
+  private readonly petsState = signal<Pet[]>([]);
+  readonly pets = this.petsState.asReadonly();
+  readonly animalTypeFilter = signal<AnimalTypeFilter>('all');
+  readonly genderFilter = signal<GenderFilter>('all');
 
-  filteredPets$: Observable<Pet[]> = combineLatest([
-    this.pets$,
-    this.animalTypeFilterSubject,
-    this.genderFilterSubject
-  ]).pipe(
-    map(([pets, animalType, gender]) => {
-      return pets.filter(pet => {
-        const matchesAnimalType = animalType === 'all' || pet.animalType === animalType;
-        const matchesGender = gender === 'all' || pet.gender === gender;
-        return matchesAnimalType && matchesGender;
-      });
-    })
-  );
+  readonly filteredPets = computed(() => {
+    const animalType = this.animalTypeFilter();
+    const gender = this.genderFilter();
+    return this.petsState().filter(pet => {
+      const matchesAnimalType = animalType === 'all' || pet.animalType === animalType;
+      const matchesGender = gender === 'all' || pet.gender === gender;
+      return matchesAnimalType && matchesGender;
+    });
+  });
 
-  isAdminMode = signal(true);
+  readonly isAdminMode = signal(true);
 
-  constructor(private http: HttpClient) {
+  constructor() {
     this.loadPets();
   }
 
@@ -39,15 +36,15 @@ export class PetService {
     this.http.get<ApiResponse<Pet[]>>(`${environment.apiUrl}/pets`).subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          this.petsSubject.next(response.data);
+          this.petsState.set(response.data);
         } else {
           console.error('Error loading pets:', response.error);
-          this.petsSubject.next([]);
+          this.petsState.set([]);
         }
       },
       error: (error) => {
         console.error('Error loading pets:', error);
-        this.petsSubject.next([]);
+        this.petsState.set([]);
       }
     });
   }
@@ -71,11 +68,11 @@ export class PetService {
   }
 
   setAnimalTypeFilter(filter: AnimalTypeFilter): void {
-    this.animalTypeFilterSubject.next(filter);
+    this.animalTypeFilter.set(filter);
   }
 
   setGenderFilter(filter: GenderFilter): void {
-    this.genderFilterSubject.next(filter);
+    this.genderFilter.set(filter);
   }
 
   addPet(formData: FormData): Observable<Pet> {
@@ -83,8 +80,7 @@ export class PetService {
       map(response => {
         if (response.success && response.data) {
           // Update local state with the new pet from server
-          const currentPets = this.petsSubject.value;
-          this.petsSubject.next([...currentPets, response.data!]);
+          this.petsState.update(currentPets => [...currentPets, response.data!]);
           return response.data;
         }
         throw new Error(response.error || 'Failed to create pet');
