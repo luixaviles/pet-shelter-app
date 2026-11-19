@@ -1,2 +1,4 @@
 .cursor/
 docs/
+.agents/
+skills-lock.json
